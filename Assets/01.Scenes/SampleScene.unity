@@ -437,8 +437,8 @@ Transform:
   m_GameObject: {fileID: 137582395}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.4, y: 0.5, z: 6.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -9.7, y: 5.27, z: 6.3}
+  m_LocalScale: {x: 6.8757334, y: 11.170717, z: 10.035479}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2127,8 +2127,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   OriginalSpeed: 7
   MoveSpeed: 7
-  DashSpeed: 50
+  DashSpeed: 15
   RollingSpeed: 50
+  climbSpeed: 3
   JumpPower: 0.5
   _isJumping: 0
   _isDubbleJumping: 0

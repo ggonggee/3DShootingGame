@@ -12,8 +12,9 @@ public class PlayerMove : MonoBehaviour
     // - 이동속도
     public float OriginalSpeed = 7f;
     public float MoveSpeed = 7f;
-    public float DashSpeed = 15f;
+    public float DashSpeed = 12f;
     public float RollingSpeed = 50f;
+    public float climbSpeed = 3f;
     public float JumpPower = 5f;
     public bool _isJumping;
     public bool _isDubbleJumping;
@@ -67,6 +68,8 @@ public class PlayerMove : MonoBehaviour
 
 
 
+
+
         // 3.점프 적용
         if (Input.GetButtonDown("Jump"))
         {
@@ -85,14 +88,20 @@ public class PlayerMove : MonoBehaviour
         // 스테미나 사용
         if(Input.GetButtonDown("Debug Multiplier"))
         {
-            HighSpeed();
-            StartCoroutine(UsingStemina());
+
+            _isUsingStemina = true;
+            if (_isUsingStemina)
+            {
+                MoveSpeed = DashSpeed;
+                StartCoroutine(UsingStemina());
+            }
         }
 
         // 스테미나 사용 끝남
         if(Input.GetButtonUp("Debug Multiplier"))
         {
-            LowSpeed();
+            _isUsingStemina = false;
+            MoveSpeed = OriginalSpeed;
         }
 
         if(_isUsingStemina == false)
@@ -106,23 +115,37 @@ public class PlayerMove : MonoBehaviour
             }
         }
 
-        // 중력 적용
-        _yVelocity += GRAVITY * Time.deltaTime;
-        dir.y = _yVelocity;
+        if ((_characterController.collisionFlags & CollisionFlags.Sides) != 0 && Input.GetKey(KeyCode.W))
+        {
+            // 벽타기 중: 중력 제거하고 위로 이동
+            dir = Vector3.up * climbSpeed;
+            _isUsingStemina = true;
+            
+        }
+        else
+        {
+            // 일반 이동 or 중력 적용
+            //dir.y += Physics.gravity.y * Time.deltaTime;
+            // 중력 적용
+            _yVelocity += GRAVITY * Time.deltaTime;
+            dir.y = _yVelocity;
+            _isUsingStemina = false;
+        }
 
         //transform.position += dir * MoveSpeed * Time.deltaTime;
         _characterController.Move(dir * MoveSpeed * Time.deltaTime);
     }
 
+
     IEnumerator UsingStemina()
     {
         while (SteminaSlider.value >= 0f && _isUsingStemina)
         {
-            SteminaSlider.value -= 0.1f;
-            yield return new WaitForSeconds(0.5f);
+            SteminaSlider.value -= 0.01f;
+            yield return new WaitForSeconds(0.1f);
             if (SteminaSlider.value <= 0f)
             {
-                LowSpeed();
+                _isUsingStemina = false;
             }
         }
     }
@@ -136,17 +159,6 @@ public class PlayerMove : MonoBehaviour
 
     }
 
-
-    private void HighSpeed()
-    {
-        MoveSpeed = DashSpeed;
-        _isUsingStemina = true;
-    }
-
-    private void LowSpeed()
-    {
-        MoveSpeed = OriginalSpeed;
-        _isUsingStemina = false;
-    }
+    
 
 }
