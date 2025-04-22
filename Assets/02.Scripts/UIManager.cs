@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     [Header("½½¶óÀÌ´õ")]
     [SerializeField] private Slider staminaSlider;
     public TextMeshProUGUI BombCountText;
+    public TextMeshProUGUI BulletCountText;
 
     private void Awake()
     {
@@ -38,5 +39,10 @@ public class UIManager : MonoBehaviour
         {
             BombCountText.text = $"ÆøÅº °³¼ö: {current}/{max}";
         }
+    }
+
+    public void SetBullet(int bullet, int max)
+    {
+        BulletCountText.text = $"ÅºÈ¯ : {bullet}/{max}";
     }
 }

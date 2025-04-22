@@ -11,7 +11,7 @@ public class PlayerFire : MonoBehaviour
     public int BulletCount;
     public int MaxBulletCount = 50;
     public float ReloadInterval = 2f;
-    public bool isShoting;
+    public bool isReLoading;
 
     public float ShotInterval = 0.3f;
     public float ShotTimer = 0;
@@ -43,7 +43,9 @@ public class PlayerFire : MonoBehaviour
     private void Start()
     {
         BombCount = MaxBombCount;
+        BulletCount = MaxBulletCount;
         UIManager.Instance.SetBomb(BombCount, MaxBombCount);
+        UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
         Cursor.lockState = CursorLockMode.Locked;
         
     }
@@ -79,13 +81,23 @@ public class PlayerFire : MonoBehaviour
                 UIManager.Instance.SetBomb(BombCount, MaxBombCount);
                 }            // 3. 발사 위치에 수류탄 생성하기
         }
-        // 1. 왼쪽 버튼 입력 받기
 
-        if (Input.GetMouseButton(0))
+        if (!isReLoading)
+        {
+            if(Input.GetKeyDown(KeyCode.R)){
+                BulletCount = MaxBulletCount;
+                UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
+            }
+        }
+
+        // 1. 왼쪽 버튼 입력 받기
+        if (Input.GetMouseButton(0) && BulletCount > 0)
         {
             ShotTimer -= Time.deltaTime;
             if(ShotTimer < 0)
             {
+                BulletCount--;
+                UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
                 ShotTimer = ShotInterval;
 
             // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
