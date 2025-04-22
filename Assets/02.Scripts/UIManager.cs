@@ -7,7 +7,10 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("슬라이더")]
-    [SerializeField] private Slider staminaSlider;
+    [SerializeField] private Slider _staminaSlider;
+    [SerializeField] private Slider _reloadSlider;
+
+
     public TextMeshProUGUI BombCountText;
     public TextMeshProUGUI BulletCountText;
 
@@ -26,10 +29,10 @@ public class UIManager : MonoBehaviour
 
     public void SetStamina(float current, float max)
     {
-        if (staminaSlider != null)
+        if (_staminaSlider != null)
         {
-            staminaSlider.maxValue = max;
-            staminaSlider.value = current;
+            _staminaSlider.maxValue = max;
+            _staminaSlider.value = current;
         }
     }
 
@@ -44,5 +47,15 @@ public class UIManager : MonoBehaviour
     public void SetBullet(int bullet, int max)
     {
         BulletCountText.text = $"탄환 : {bullet}/{max}";
+    }
+
+    public void SetReload(float value, float max, bool isReloading)
+    {
+        _reloadSlider.value = value;
+        _reloadSlider.gameObject.SetActive(isReloading);
+        //if (max <= value)
+        //{
+        //    _reloadslider.gameobject.setactive(false);
+        //}
     }
 }
