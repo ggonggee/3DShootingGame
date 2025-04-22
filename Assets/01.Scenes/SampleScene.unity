@@ -1570,6 +1570,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &843120221
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 843120223}
+  - component: {fileID: 843120222}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &843120222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843120221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31830139e4e352641a23301b221ec5b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  staminaSlider: {fileID: 1371874841}
+--- !u!4 &843120223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843120221}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &860600374
 GameObject:
   m_ObjectHideFlags: 0
@@ -2125,17 +2170,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d82c4c65ca775af4d97b13cb37fe11ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OriginalSpeed: 7
-  MoveSpeed: 7
-  DashSpeed: 15
-  RollingSpeed: 50
-  climbSpeed: 3
-  JumpPower: 0.5
-  _isJumping: 0
-  _isDubbleJumping: 0
-  _isLolling: 0
-  SteminaSlider: {fileID: 1371874841}
-  _isUsingStemina: 0
+  JumpPower: 3
+  MaxJumpCount: 2
+  WalkSpeed: 5
+  SprintSpeed: 9
+  ClimbSpeed: 3
+  Stamina: 5
+  MaxStamina: 5
+  DrainPerSecondClimb: 1
+  DrainPerSecondSprint: 1.5
+  RecoverPerSecond: 2
+  RollSpeed: 15
+  RollDuration: 0.3
+  RollStaminaCost: 1.5
 --- !u!143 &1209235952
 CharacterController:
   m_ObjectHideFlags: 0
@@ -2276,7 +2323,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 439877701}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 5
   m_WholeNumbers: 0
   m_Value: 0.59
   m_OnValueChanged:
@@ -2741,3 +2788,4 @@ SceneRoots:
   - {fileID: 1185644170}
   - {fileID: 481813849}
   - {fileID: 903609243}
+  - {fileID: 843120223}
