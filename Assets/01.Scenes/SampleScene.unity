@@ -2585,7 +2585,7 @@ MonoBehaviour:
   ShotTimer: 0
   BombPrefab: {fileID: 7696377051524557421, guid: 00a78e39c2f95c6449062057e4cb3ef7, type: 3}
   BombCount: 0
-  MaxBombCount: 100
+  MaxBombCount: 3
   MinThrowPower: 10
   MaxThrowPower: 25
   MaxHoldTime: 2
