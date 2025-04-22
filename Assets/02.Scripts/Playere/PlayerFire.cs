@@ -1,66 +1,116 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 public class PlayerFire : MonoBehaviour
 {
     public GameObject FirePosition;
-
     public GameObject BombPrefab;
+    public int BombCount;
+    public int MaxBombCount = 10;
 
-    // - ´øÁö´Â Èû
+    public int BulletCount;
+    public int MaxBulletCount = 50;
+    public float ReloadInterval = 2f;
+    public bool isShoting;
+
+    public float ShotInterval = 0.3f;
+    public float ShotTimer = 0;
+
+
+    public float MinThrowPower = 10f;  //ìµœì†Œ ë˜ì§€ëŠ” í˜(ì˜ˆ: 10f)
+    public float MaxThrowPower = 25f;  //ìµœëŒ€ ë˜ì§€ëŠ” í˜(ì˜ˆ: 25f)
+    public float MaxHoldTime = 2f;    //ìµœëŒ€ ì¶©ì „ ì‹œê°„(ì˜ˆ: 2ì´ˆ) â€” ì´ ì´ìƒì€ ë” ì•ˆ ëŠ˜ì–´ë‚¨
+    private float _holdStartTime; //ë§ˆìš°ìŠ¤ë¥¼ ëˆ„ë¥¸ ì‹œê°„(Time.time)ì„ ì €ì¥
+    private bool _isHolding;      //ë§ˆìš°ìŠ¤ë¥¼ ëˆ„ë¥´ê³  ìˆëŠ” ì¤‘ì¸ì§€ ì—¬ë¶€
+
+    // - ë˜ì§€ëŠ” í˜
     public float ThrowPower = 15f;
 
-    // ¸ñÇ¥: ¸¶¿ì½º ¿ŞÂÊ ¹öÆ°À» ´©¸£¸é Ä«¸Ş¶ó°¡ ¹Ù¶óº¸´Â ¹æÇâÀ¸·Î ÃÑÀ» ¹ß»çÇÏ°í ½Í´Ù. 
+    // ëª©í‘œ: ë§ˆìš°ìŠ¤ ì™¼ìª½ ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ì¹´ë©”ë¼ê°€ ë°”ë¼ë³´ëŠ” ë°©í–¥ìœ¼ë¡œ ì´ì„ ë°œì‚¬í•˜ê³  ì‹¶ë‹¤. 
 
     public ParticleSystem BulletEffect;
 
+
+    // ê³¼ì œ 1. í­íƒ„ ê°œìˆ˜ 3ê°œë¡œ ì œí•œí•˜ê¸°
+    // - í•˜ë‹¨ì—('í˜„ì¬ ê°œìˆ˜'/'ìµœëŒ€ ê°œìˆ˜') í˜•íƒœë¡œ UI Textí‘œì‹œ(TMP, í•œê¸€ì§€ì›ë˜ëŠ” í°íŠ¸)
+
+    // ê³¼ì œ 2. ë§ˆìš°ìŠ¤ ì˜¤ë¥¸ìª½ ëˆ„ë¥´ê³  ìˆë‹¤ê°€ ë•Œë©´ í­íƒ„ ë” ë©€ë¦¬ ë‚ ë¼ê°€ê¸°
+    // - ëˆ„ë¥´ê³  ìˆëŠ” ì‹œê°„ì— ë¹„ë¡€(ìµœëŒ€ì¹˜ê°€ ìˆë‹¤.)
+
+    // ê³¼ì œ 4. ë§ˆìš°ìŠ¤ ì™¼ìª½ ë²„íŠ¼ ëˆ„ë¥´ê³  ìˆìœ¼ë©´ ì—°ì‚¬í•˜ê¸°
+    // - ì¿¨íƒ€ì„ ì¡´ì¬
+
     private void Start()
     {
+        BombCount = MaxBombCount;
+        UIManager.Instance.SetBomb(BombCount, MaxBombCount);
         Cursor.lockState = CursorLockMode.Locked;
+        
     }
-
 
     private void Update()
     {
-       
-
-        // 2. ¿À¸¥ÂÊ ¹öÆ° ÀÔ·Â ¹Ş±â
-        // - 0: ¿ŞÂÊ, 1: ¿À¸¥ÂÊ, 2: ÈÙ
         if (Input.GetMouseButtonDown(1))
         {
-            // 3. ¹ß»ç À§Ä¡¿¡ ¼ö·ùÅº »ı¼ºÇÏ±â
-            GameObject bomb = Instantiate(BombPrefab);
-            bomb.transform.position = FirePosition.transform.position;
-
-            // 4. »ı¼ºµÈ ½´·ùÅºÀ» Ä«¸Ş¶ó ¹æÇâÀ¸·Î ¹°¸®ÀûÀÎ Èû °¡ÇÏ±â
-            Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
-            bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
+            _isHolding = true;
+            _holdStartTime = Time.time;
         }
-        // 1. ¿ŞÂÊ ¹öÆ° ÀÔ·Â ¹Ş±â
 
-        if (Input.GetMouseButtonDown(0))
+        // 2. ì˜¤ë¥¸ìª½ ë²„íŠ¼ ì…ë ¥ ë°›ê¸°
+        // - 0: ì™¼ìª½, 1: ì˜¤ë¥¸ìª½, 2: íœ 
+        if (Input.GetMouseButtonUp(1))
         {
-            // 2. ·¹ÀÌ¸¦ »ı¼ºÇÏ°í ¹ß»ç À§Ä¡¿Í ÁøÇà ¹æÇâÀ» ¼³Á¤
+            _isHolding = false;
+            ThrowPower = MinThrowPower* Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * 1.5f;
+            ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
+
+            if(BombCount > 0)
+            {
+                GameObject bomb = PollingManager.Instance.GetBombPrefab();
+                bomb.transform.position = FirePosition.transform.position;
+
+                // 4. ìƒì„±ëœ ìŠˆë¥˜íƒ„ì„ ì¹´ë©”ë¼ ë°©í–¥ìœ¼ë¡œ ë¬¼ë¦¬ì ì¸ í˜ ê°€í•˜ê¸°
+                Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
+                // ë°˜ë“œì‹œ ì´ˆê¸°í™”!
+                bombRigidbody.angularVelocity = Vector3.zero;
+                bombRigidbody.linearVelocity = Vector3.zero; 
+                bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
+                BombCount -= 1;
+                UIManager.Instance.SetBomb(BombCount, MaxBombCount);
+                }            // 3. ë°œì‚¬ ìœ„ì¹˜ì— ìˆ˜ë¥˜íƒ„ ìƒì„±í•˜ê¸°
+        }
+        // 1. ì™¼ìª½ ë²„íŠ¼ ì…ë ¥ ë°›ê¸°
+
+        if (Input.GetMouseButton(0))
+        {
+            ShotTimer -= Time.deltaTime;
+            if(ShotTimer < 0)
+            {
+                ShotTimer = ShotInterval;
+
+            // 2. ë ˆì´ë¥¼ ìƒì„±í•˜ê³  ë°œì‚¬ ìœ„ì¹˜ì™€ ì§„í–‰ ë°©í–¥ì„ ì„¤ì •
             Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
                 
-            // 3. ·¹ÀÌ¿Í ºÎµóÈù ¹°Ã¼ÀÇ Á¤º¸¸¦ ÀúÀåÇÒ º¯¼ö¸¦ »ı¼º
+            // 3. ë ˆì´ì™€ ë¶€ë”›íŒ ë¬¼ì²´ì˜ ì •ë³´ë¥¼ ì €ì¥í•  ë³€ìˆ˜ë¥¼ ìƒì„±
             RaycastHit hitInfo = new RaycastHit();
 
-            // 4. ·¹ÀÌÀú¸¦ ¹ß»çÇÑ ´ÙÀ½,                 -¿¡ µ¥ÀÌÅÍ°¡ ÀÖ´Ù¸é(ºÎµ÷Çû´Ù¸é) ÇÇ°İ ÀÌÆåÆ® »ı¼º(Ç¥½Ã)
+            // 4. ë ˆì´ì €ë¥¼ ë°œì‚¬í•œ ë‹¤ìŒ,                 -ì— ë°ì´í„°ê°€ ìˆë‹¤ë©´(ë¶€ë”§í˜”ë‹¤ë©´) í”¼ê²© ì´í™íŠ¸ ìƒì„±(í‘œì‹œ)
             bool isHit = Physics.Raycast(ray, out hitInfo);
-            if (isHit) //µ¥ÀÌÅÍ°¡ ÀÖ´Ù¸é (ºÎµóÇû´Ù¸é
+            if (isHit) //ë°ì´í„°ê°€ ìˆë‹¤ë©´ (ë¶€ë”›í˜”ë‹¤ë©´
             {
-                // ÇÇ°İ ÀÌÆåÆ® »ı¼º(Ç¥½Ã)
+                // í”¼ê²© ì´í™íŠ¸ ìƒì„±(í‘œì‹œ)
                 BulletEffect.transform.position = hitInfo.point;
-                BulletEffect.transform.forward = hitInfo.normal; //¹ı¼± º¤ÅÍ: Á÷¼±¿¡ ´ëÇÏ¿© ¼öÁ÷ÀÎ º¤ÅÍ
+                BulletEffect.transform.forward = hitInfo.normal; //ë²•ì„  ë²¡í„°: ì§ì„ ì— ëŒ€í•˜ì—¬ ìˆ˜ì§ì¸ ë²¡í„°
                 BulletEffect.Play();
 
-                // °ÔÀÓ ¼öÇĞ: ¼±Çü´ë¼öÇĞ(½ºÄ®¶ó, º¤ÅÍ, Çà·Ä), ±âÇÏÇĞ(»ï°¢ÇÔ¼ö..)
+                // ê²Œì„ ìˆ˜í•™: ì„ í˜•ëŒ€ìˆ˜í•™(ìŠ¤ì¹¼ë¼, ë²¡í„°, í–‰ë ¬), ê¸°í•˜í•™(ì‚¼ê°í•¨ìˆ˜..)
                     
             }
-            // Ray: ·¹ÀÌÀú( ½ÃÀÛÀ§Ä¡, ¹æÇâ)
-            // RayCast : ·¹ÀÌÀú¸¦ ¹ß»ç
-            // RayCastHit: ·¹ÀÌÀú°¡ ¹°Ã¼¿Í ºÎµóÇû´Ù¸é ±× Á¤º¸¸¦ ÀúÀåÇÏ´Â ±¸Á¶Ã¼
+            // Ray: ë ˆì´ì €( ì‹œì‘ìœ„ì¹˜, ë°©í–¥)
+            // RayCast : ë ˆì´ì €ë¥¼ ë°œì‚¬
+            // RayCastHit: ë ˆì´ì €ê°€ ë¬¼ì²´ì™€ ë¶€ë”›í˜”ë‹¤ë©´ ê·¸ ì •ë³´ë¥¼ ì €ì¥í•˜ëŠ” êµ¬ì¡°ì²´
             Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * 10f, Color.red, 2f);
+            }
         }
     }
 }

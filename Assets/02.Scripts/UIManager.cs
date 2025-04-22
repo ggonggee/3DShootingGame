@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ public class UIManager : MonoBehaviour
 
     [Header("½½¶óÀÌ´õ")]
     [SerializeField] private Slider staminaSlider;
+    public TextMeshProUGUI BombCountText;
 
     private void Awake()
     {
@@ -27,6 +29,14 @@ public class UIManager : MonoBehaviour
         {
             staminaSlider.maxValue = max;
             staminaSlider.value = current;
+        }
+    }
+
+    public void SetBomb(int current, int max)
+    {
+        if(BombCountText != null)
+        {
+            BombCountText.text = $"ÆøÅº °³¼ö: {current}/{max}";
         }
     }
 }

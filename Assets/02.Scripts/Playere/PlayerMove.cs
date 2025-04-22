@@ -40,7 +40,6 @@ public class PlayerMove : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
         UIManager.Instance.SetStamina(Stamina, MaxStamina);
-
     }
 
     private void Update()
