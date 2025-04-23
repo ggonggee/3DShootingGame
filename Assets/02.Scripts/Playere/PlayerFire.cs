@@ -107,6 +107,35 @@ public class PlayerFire : MonoBehaviour
             UIManager.Instance.SetReload(ReloadTimer,ReloadInterval, isReLoading);
         }
 
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
+
+            // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
+            RaycastHit hitInfo = new RaycastHit();
+
+            // 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
+            bool isHit = Physics.Raycast(ray, out hitInfo);
+            if (isHit) //데이터가 있다면 (부딛혔다면
+            {
+                // 피격 이펙트 생성(표시)
+                BulletEffect.transform.position = hitInfo.point;
+                BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
+                BulletEffect.Play();
+
+                if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                {
+                    Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                    Damage damage = new Damage();
+                    damage.Value = 10;
+                    damage.From = this.gameObject;
+
+                    enemy.TakeKnockback(damage);
+                }
+            }
+        }
+
 
         // 1. 왼쪽 버튼 입력 받기
         if (Input.GetMouseButton(0) && BulletCount > 0)
@@ -135,9 +164,25 @@ public class PlayerFire : MonoBehaviour
                 BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
                 BulletEffect.Play();
 
-                // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
-                    
-            }
+                if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                {
+                    Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                    Damage damage = new Damage();
+                    damage.Value = 10;
+                    damage.From = this.gameObject;
+
+                    enemy.TakeDamage(damage);
+                }
+
+
+
+
+                    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
+
+                }
+
+
                 // Ray: 레이저( 시작위치, 방향)
                 // RayCast : 레이저를 발사
                 // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
