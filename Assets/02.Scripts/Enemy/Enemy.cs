@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -38,7 +39,8 @@ public class Enemy : MonoBehaviour
     private float _attackTimer = 0f;     // ㄴ 체크기
     public int Health = 100;
     public float DamagedTime = 0.5f;   // 경직 시간
-    private float _damagedTimer = 0f;     // ㄴ 체크기
+    public float _dethTime = 1f;
+    public float MinDistance = 0.1f;
 
     private float _knockbackForce = 30f;
     private float _knockbackDuration = 0.1f;
@@ -47,10 +49,10 @@ public class Enemy : MonoBehaviour
 
     //일정시간이 있으면 다른 곳으로 이동한다.
     [Header("패트롤")]
-    public Transform[] PatrolPoints;
+    public Transform[] PatrolPositions;
     private float _patrolInterval = 3f;
     private float _patrolTimer;
-    private int _nextPointNumber;
+    private int _PatrolPositionIndex = 0;
 
 
     private void Start()
@@ -95,20 +97,9 @@ public class Enemy : MonoBehaviour
                     break;
                 }
 
-            case EnemyState.Damaged:
-                {
-                    Damaged();
-                    break;
-                }
             case EnemyState.Knockback:
                 {
                     Knockback();
-                    break;
-                }
-
-            case EnemyState.Die:
-                {
-                    Die();
                     break;
                 }
         }
@@ -116,12 +107,26 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(Damage damage)
     {
+        //사망했거나 공격받고 있는 중이라면..
+        if(CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
+        {
+            return;
+        }
         Health -= damage.Value;
+
+        if(Health <= 0)
+        {
+            Debug.Log($"상태전환: {CurrentState} -> Die");
+            CurrentState = EnemyState.Die;
+            StartCoroutine(Die_Coroutin());
+            return;
+        }
 
         Debug.Log($"상태전환: {CurrentState} -> Damaged");
 
-        _damagedTimer = 0f;
+        //_damagedTimer = 0f;
         CurrentState = EnemyState.Damaged;
+        StartCoroutine(Damaged_Coroutine());
     }
 
     public void TakeKnockback(Damage damage)
@@ -152,8 +157,13 @@ public class Enemy : MonoBehaviour
         if(_patrolTimer > _patrolInterval)
         {
             _patrolTimer = 0;
-            _nextPointNumber++;
             Debug.Log("상태전환: Idle -> Patrol");
+            _startPosition = PatrolPositions[_PatrolPositionIndex].position;
+            _PatrolPositionIndex++;
+            if(_PatrolPositionIndex >= PatrolPositions.Length)
+            {
+                _PatrolPositionIndex = 0;
+            }
             CurrentState = EnemyState.patrol;
         }
 
@@ -171,12 +181,12 @@ public class Enemy : MonoBehaviour
         // 행동 : 페트롤 포인트를 왔다 갔다 한다.
         // 포인트를 도착하면 Idle로 간다.
         // idle에서 일정시간 머무르면 Patrol로 넘어간다
-
-        Vector3 dir = transform.position - PatrolPoints[_nextPointNumber].position;
+        Vector3 dir = (_startPosition - transform.position).normalized;
         _characterController.Move(dir * MoveSpeed * Time.deltaTime);
-        if(Vector3.Distance( transform.position, PatrolPoints[_nextPointNumber].position) <= _characterController.minMoveDistance)
+        if(Vector3.Distance( transform.position, _startPosition) <= MinDistance)
         {
-            transform.position = PatrolPoints[_nextPointNumber].position;
+            Debug.Log("상태전환: Patrol -> Idle");
+            transform.position =_startPosition;
             CurrentState = EnemyState.Idle;
         }
     }
@@ -207,7 +217,7 @@ public class Enemy : MonoBehaviour
     private void Return()
     {
         // 전이: 시작 위치와 가까워 지면 -> Idle
-        if (Vector3.Distance(transform.position, _startPosition) <= _characterController.minMoveDistance)
+        if (Vector3.Distance(transform.position, _startPosition) <= MinDistance)
         {
             Debug.Log("상태전환: Return -> Idle");
             transform.position = _startPosition;
@@ -248,34 +258,40 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void Damaged()
-    {
-        // 행동: 일정 시간동안 멈춰있다가 -> Trace
-        _damagedTimer += Time.deltaTime;
-        if (_damagedTimer >= DamagedTime)
-        {
-            _damagedTimer = 0f;
-            Debug.Log("상태전환: Damaged -> Trace");
-            CurrentState = EnemyState.Trace;
-        }
-    }
-
     private void Knockback()
     {
         // 행동: 공격을 당하면 뒤로 밀려난다.
-        Vector3 dir = (_player.transform.position - transform.position ).normalized;
+        Vector3 dir = (_player.transform.position - transform.position).normalized;
         _characterController.Move(dir * -_knockbackForce * Time.deltaTime);
         _knockbackTimer += Time.deltaTime;
-        if(_knockbackTimer > _knockbackDuration)
+        if (_knockbackTimer > _knockbackDuration)
         {
             _knockbackTimer = 0;
             CurrentState = EnemyState.Trace;
         }
     }
 
-    private void Die()
+    private IEnumerator Damaged_Coroutine()
     {
-        // 행동 죽는다.
+        // 행동: 일정 시간동안 멈춰있다가 -> Trace
+        //_damagedTimer += Time.deltaTime;
+        //if (_damagedTimer >= DamagedTime)
+        //{
+        //    _damagedTimer = 0f;
+        //    Debug.Log("상태전환: Damaged -> Trace");
+        //    CurrentState = EnemyState.Trace;
+        //}
+
+        //코루틴 방식으로 변경
+        yield return new WaitForSeconds(DamagedTime);
+        Debug.Log("상태전환: Damaged -> Trace");
+        CurrentState = EnemyState.Trace;
+    }
+
+    private IEnumerator Die_Coroutin()
+    {
+        yield return new WaitForSeconds(_dethTime);
+        transform.gameObject.SetActive(false);
     }
 
 }
