@@ -31,7 +31,7 @@ public class PlayerMove : MonoBehaviour
     private float _rollTimer = 0f;
     private Vector3 _rollDirection;
 
-    private const float Gravity = -9.8f;
+    private const float _gravity = -9.8f;
     private float _yVelocity = 0f;
 
     private CharacterController _controller;
@@ -101,7 +101,7 @@ public class PlayerMove : MonoBehaviour
         }
         else
         {
-            _yVelocity += Gravity * Time.deltaTime;
+            _yVelocity += _gravity * Time.deltaTime;
             dir.y = _yVelocity;
         }
 

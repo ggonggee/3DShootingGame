@@ -16,6 +16,7 @@ public class PlayerFire : MonoBehaviour
     [Header("총발사 간격")]
     public float ShotInterval = 0.1f;
     public float ShotTimer = 0;
+    private const float DebugRayLength = 10f;
 
     [Header("슈류탄 투척")]
     public GameObject BombPrefab;
@@ -24,10 +25,10 @@ public class PlayerFire : MonoBehaviour
     public float MinThrowPower = 10f;  //최소 던지는 힘(예: 10f)
     public float MaxThrowPower = 25f;  //최대 던지는 힘(예: 25f)
     public float MaxHoldTime = 2f;    //최대 충전 시간(예: 2초) — 이 이상은 더 안 늘어남
+    public float ThrowPower = 15f; // 던지는 힘
     private float _holdStartTime; //마우스를 누른 시간(Time.time)을 저장
     private bool _isHolding;      //마우스를 누르고 있는 중인지 여부
-    public float ThrowPower = 15f; // 던지는 힘
-
+    private const float ThrowPowerMultiplier = 1.5f;
 
     // 목표: 마우스 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다. 
 
@@ -66,7 +67,7 @@ public class PlayerFire : MonoBehaviour
         if (Input.GetMouseButtonUp(1))
         {
             _isHolding = false;
-            ThrowPower = MinThrowPower* Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * 1.5f;
+            ThrowPower = MinThrowPower* Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
             ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
 
             if(BombCount > 0)
@@ -137,10 +138,10 @@ public class PlayerFire : MonoBehaviour
                 // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
                     
             }
-            // Ray: 레이저( 시작위치, 방향)
-            // RayCast : 레이저를 발사
-            // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
-            Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * 10f, Color.red, 2f);
+                // Ray: 레이저( 시작위치, 방향)
+                // RayCast : 레이저를 발사
+                // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+                Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
             }
         }
     }
