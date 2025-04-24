@@ -1,17 +1,18 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Rendering;
 
 
-// ÀÎ°øÁö´É: »ç¶ûÃ³·³ ¶È¶ÈÇÏ°Ô Çàµ¿ÇÏ´Â ¾Ë°í¸®Áò
-// - ¹İÀÀÇü/°èÈ¹Çü -> ±ÔÄ¢ ±â¹İ ÀÎ°øÁö´É (ÀüÅëÀûÀÎ ¹æ½Ä)
-//               ->   ¤¤ Á¦¾î¹®(Á¶°Ç¹®, ¹İº¹¹®)
+// ì¸ê³µì§€ëŠ¥: ì‚¬ë‘ì²˜ëŸ¼ ë˜‘ë˜‘í•˜ê²Œ í–‰ë™í•˜ëŠ” ì•Œê³ ë¦¬ì¦˜
+// - ë°˜ì‘í˜•/ê³„íší˜• -> ê·œì¹™ ê¸°ë°˜ ì¸ê³µì§€ëŠ¥ (ì „í†µì ì¸ ë°©ì‹)
+//               ->   ã„´ ì œì–´ë¬¸(ì¡°ê±´ë¬¸, ë°˜ë³µë¬¸)
 
 public class Enemy : MonoBehaviour
 {
-    // 1. »óÅÂ¸¦ ¿­°ÅÇüÀ¸·Î Á¤ÀÇÇÑ´Ù.
+    // 1. ìƒíƒœë¥¼ ì—´ê±°í˜•ìœ¼ë¡œ ì •ì˜í•œë‹¤.
     public enum EnemyState
     {
         Idle,
@@ -24,21 +25,22 @@ public class Enemy : MonoBehaviour
         Die,
     }
 
-    // 2. ÇöÀç »óÅÂ¸¦ ÁöÁ¤ÇÑ´Ù.
-    public EnemyState CurrentState = EnemyState.Idle;
+    // 2. í˜„ì¬ ìƒíƒœë¥¼ ì§€ì •í•œë‹¤.
+    public EnemyState CurrentState = EnemyState.Trace;
+    [SerializeField]
+    private GameObject _player;                       // í”Œë ˆì´ì–´
+    private CharacterController _characterController; // ìºë¦­í„° ì»¨íŠ¸ë¡¤ëŸ¬
+    private NavMeshAgent _agent;                      // ë„¤ë¹„ë©”ì‰¬ ì—ì´ì ¼ë“œ
+    private Vector3 _startPosition;                   // ì‹œì‘ ìœ„ì¹˜
 
-    private GameObject _player;                       // ÇÃ·¹ÀÌ¾î
-    private CharacterController _characterController; // Ä³¸¯ÅÍ ÄÁÆ®·Ñ·¯
-    private Vector3 _startPosition;                   // ½ÃÀÛ À§Ä¡
-
-    public float FindDistance = 5f;     // ÇÃ·¹ÀÌ¾î ¹ß°ß ¹üÀ§
-    public float ReturnDistance = 5f;     // Àû º¹±Í ¹üÀ§
-    public float AttackDistance = 2.5f;   // ÇÃ·¹ÀÌ¾î °ø°İ ¹üÀ§
-    public float MoveSpeed = 3.3f;   // ÀÌµ¿ ¼Óµµ
-    public float AttackCooltime = 2f;     // °ø°İ ÄğÅ¸ÀÓ
-    private float _attackTimer = 0f;     // ¤¤ Ã¼Å©±â
+    public float FindDistance = 5f;     // í”Œë ˆì´ì–´ ë°œê²¬ ë²”ìœ„
+    public float ReturnDistance = 5f;     // ì  ë³µê·€ ë²”ìœ„
+    public float AttackDistance = 2.5f;   // í”Œë ˆì´ì–´ ê³µê²© ë²”ìœ„
+    public float MoveSpeed = 3.3f;   // ì´ë™ ì†ë„
+    public float AttackCooltime = 2f;     // ê³µê²© ì¿¨íƒ€ì„
+    private float _attackTimer = 0f;     // ã„´ ì²´í¬ê¸°
     public int Health = 100;
-    public float DamagedTime = 0.5f;   // °æÁ÷ ½Ã°£
+    public float DamagedTime = 0.5f;   // ê²½ì§ ì‹œê°„
     public float _dethTime = 1f;
     public float MinDistance = 0.1f;
 
@@ -47,8 +49,8 @@ public class Enemy : MonoBehaviour
     private float _knockbackTimer = 0;
 
 
-    //ÀÏÁ¤½Ã°£ÀÌ ÀÖÀ¸¸é ´Ù¸¥ °÷À¸·Î ÀÌµ¿ÇÑ´Ù.
-    [Header("ÆĞÆ®·Ñ")]
+    //ì¼ì •ì‹œê°„ì´ ìˆìœ¼ë©´ ë‹¤ë¥¸ ê³³ìœ¼ë¡œ ì´ë™í•œë‹¤.
+    [Header("íŒ¨íŠ¸ë¡¤")]
     public Transform[] PatrolPositions;
     private float _patrolInterval = 3f;
     private float _patrolTimer;
@@ -57,6 +59,9 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+        _agent = GetComponent<NavMeshAgent>();
+        _agent.speed = MoveSpeed;
+
         _startPosition = transform.position;
         _characterController = GetComponent<CharacterController>();
         _player = GameObject.FindGameObjectWithTag("Player");
@@ -65,49 +70,52 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        // ³ªÀÇ ÇöÀç »óÅÂ¿¡ µû¶ó »óÅÂ ÇÔ¼ö¸¦ È£ÃâÇÑ´Ù.
-        switch (CurrentState)
-        {
-            case EnemyState.Idle:
-                {
-                    Idle();
-                    break;
-                }
-            case EnemyState.patrol:
-                {
-                    Patrol();
-                    break;
-                }
+        Vector3 dir = _player.transform.position - transform.position;
+        _agent.SetDestination(_player.transform.position);
 
-            case EnemyState.Trace:
-                {
-                    Trace();
-                    break;
-                }
+        // ë‚˜ì˜ í˜„ì¬ ìƒíƒœì— ë”°ë¼ ìƒíƒœ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•œë‹¤.
+        //switch (CurrentState)
+        //{
+        //    case EnemyState.Idle:
+        //        {
+        //            Idle();
+        //            break;
+        //        }
+        //    case EnemyState.patrol:
+        //        {
+        //            Patrol();
+        //            break;
+        //        }
 
-            case EnemyState.Return:
-                {
-                    Return();
-                    break;
-                }
+        //    case EnemyState.Trace:
+        //        {
+        //            Trace();
+        //            break;
+        //        }
 
-            case EnemyState.Attack:
-                {
-                    Attack();
-                    break;
-                }
+        //    case EnemyState.Return:
+        //        {
+        //            Return();
+        //            break;
+        //        }
 
-            case EnemyState.Knockback:
-                {
-                    Knockback();
-                    break;
-                }
-        }
+        //    case EnemyState.Attack:
+        //        {
+        //            Attack();
+        //            break;
+        //        }
+
+        //    case EnemyState.Knockback:
+        //        {
+        //            Knockback();
+        //            break;
+        //        }
+        //}
     }
 
     public void TakeDamage(Damage damage)
     {
-        //»ç¸ÁÇß°Å³ª °ø°İ¹Ş°í ÀÖ´Â ÁßÀÌ¶ó¸é..
+        //ì‚¬ë§í–ˆê±°ë‚˜ ê³µê²©ë°›ê³  ìˆëŠ” ì¤‘ì´ë¼ë©´..
         if(CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
         {
             return;
@@ -116,16 +124,16 @@ public class Enemy : MonoBehaviour
 
         if(Health <= 0)
         {
-            Debug.Log($"»óÅÂÀüÈ¯: {CurrentState} -> Die");
+            Debug.Log($"ìƒíƒœì „í™˜: {CurrentState} -> Die");
             CurrentState = EnemyState.Die;
             StartCoroutine(Die_Coroutin());
             return;
         }
 
-        Debug.Log($"»óÅÂÀüÈ¯: {CurrentState} -> Damaged");
+        //Debug.Log($"ìƒíƒœì „í™˜: {CurrentState} -> Damaged");
 
         //_damagedTimer = 0f;
-        CurrentState = EnemyState.Damaged;
+        //CurrentState = EnemyState.Damaged;
         StartCoroutine(Damaged_Coroutine());
     }
 
@@ -133,31 +141,31 @@ public class Enemy : MonoBehaviour
     {
         Health -= damage.Value;
 
-        Debug.Log($"»óÅÂ ÀüÈ¯ {CurrentState} -> Knockback");
+        Debug.Log($"ìƒíƒœ ì „í™˜ {CurrentState} -> Knockback");
         _knockbackTimer = 0;
         CurrentState = EnemyState.Knockback;
     }
 
 
-    // 3. »óÅÂ ÇÔ¼öµéÀ» ±¸ÇöÇÑ´Ù.
+    // 3. ìƒíƒœ í•¨ìˆ˜ë“¤ì„ êµ¬í˜„í•œë‹¤.
 
     private void Idle()
     {
-        // Çàµ¿: °¡¸¸È÷ ÀÖ´Â´Ù. 
+        // í–‰ë™: ê°€ë§Œíˆ ìˆëŠ”ë‹¤. 
 
-        // ÀüÀÌ: ÇÃ·¹ÀÌ¾î¿Í °¡±î¿ö Áö¸é -> Trace
+        // ì „ì´: í”Œë ˆì´ì–´ì™€ ê°€ê¹Œì›Œ ì§€ë©´ -> Trace
         if (Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Idle -> Trace");
+            Debug.Log("ìƒíƒœì „í™˜: Idle -> Trace");
             CurrentState = EnemyState.Trace;
         }
 
-        // ÀüÀÌ: ½Ã°£ÀÌ Áö³ª¸é ÆĞÆ®·ÑÀ» ÇÑ´Ù.
+        // ì „ì´: ì‹œê°„ì´ ì§€ë‚˜ë©´ íŒ¨íŠ¸ë¡¤ì„ í•œë‹¤.
         _patrolTimer += Time.deltaTime;
         if(_patrolTimer > _patrolInterval)
         {
             _patrolTimer = 0;
-            Debug.Log("»óÅÂÀüÈ¯: Idle -> Patrol");
+            Debug.Log("ìƒíƒœì „í™˜: Idle -> Patrol");
             _startPosition = PatrolPositions[_PatrolPositionIndex].position;
             _PatrolPositionIndex++;
             if(_PatrolPositionIndex >= PatrolPositions.Length)
@@ -171,21 +179,22 @@ public class Enemy : MonoBehaviour
     }
     private void Patrol()
     {
-        // ÀüÀÌ: ÇÃ·¹ÀÌ¾î¿Í °¡±î¿ö Áö¸é -> Trace
+        // ì „ì´: í”Œë ˆì´ì–´ì™€ ê°€ê¹Œì›Œ ì§€ë©´ -> Trace
         if (Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Patrol -> Trace");
+            Debug.Log("ìƒíƒœì „í™˜: Patrol -> Trace");
             CurrentState = EnemyState.Trace;
         }
 
-        // Çàµ¿ : ÆäÆ®·Ñ Æ÷ÀÎÆ®¸¦ ¿Ô´Ù °¬´Ù ÇÑ´Ù.
-        // Æ÷ÀÎÆ®¸¦ µµÂøÇÏ¸é Idle·Î °£´Ù.
-        // idle¿¡¼­ ÀÏÁ¤½Ã°£ ¸Ó¹«¸£¸é Patrol·Î ³Ñ¾î°£´Ù
+        // í–‰ë™ : í˜íŠ¸ë¡¤ í¬ì¸íŠ¸ë¥¼ ì™”ë‹¤ ê°”ë‹¤ í•œë‹¤.
+        // í¬ì¸íŠ¸ë¥¼ ë„ì°©í•˜ë©´ Idleë¡œ ê°„ë‹¤.
+        // idleì—ì„œ ì¼ì •ì‹œê°„ ë¨¸ë¬´ë¥´ë©´ Patrolë¡œ ë„˜ì–´ê°„ë‹¤
         Vector3 dir = (_startPosition - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        //_characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        _agent.SetDestination(_startPosition);
         if(Vector3.Distance( transform.position, _startPosition) <= MinDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Patrol -> Idle");
+            Debug.Log("ìƒíƒœì „í™˜: Patrol -> Idle");
             transform.position =_startPosition;
             CurrentState = EnemyState.Idle;
         }
@@ -193,74 +202,76 @@ public class Enemy : MonoBehaviour
 
     private void Trace()
     {
-        // ÀüÀÌ: ÇÃ·¹ÀÌ¾î¿Í ¸Ö¾îÁö¸é -> Return
+        // ì „ì´: í”Œë ˆì´ì–´ì™€ ë©€ì–´ì§€ë©´ -> Return
         if (Vector3.Distance(transform.position, _player.transform.position) > ReturnDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Trace -> Return");
+            Debug.Log("ìƒíƒœì „í™˜: Trace -> Return");
             CurrentState = EnemyState.Return;
             return;
         }
 
-        // ÀüÀÌ: °ø°İ ¹üÀ§ ¸¸Å­ °¡±î¿ö Áö¸é -> Attack
+        // ì „ì´: ê³µê²© ë²”ìœ„ ë§Œí¼ ê°€ê¹Œì›Œ ì§€ë©´ -> Attack
         if (Vector3.Distance(transform.position, _player.transform.position) < AttackDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Trace -> Attack");
+            Debug.Log("ìƒíƒœì „í™˜: Trace -> Attack");
             CurrentState = EnemyState.Attack;
             return;
         }
 
-        // Çàµ¿: ÇÃ·¹ÀÌ¾î¸¦ ÃßÀûÇÑ´Ù.
+        // í–‰ë™: í”Œë ˆì´ì–´ë¥¼ ì¶”ì í•œë‹¤.
         Vector3 dir = (_player.transform.position - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        //_characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        _agent.SetDestination(_player.transform.position);
     }
 
     private void Return()
     {
-        // ÀüÀÌ: ½ÃÀÛ À§Ä¡¿Í °¡±î¿ö Áö¸é -> Idle
+        // ì „ì´: ì‹œì‘ ìœ„ì¹˜ì™€ ê°€ê¹Œì›Œ ì§€ë©´ -> Idle
         if (Vector3.Distance(transform.position, _startPosition) <= MinDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Return -> Idle");
+            Debug.Log("ìƒíƒœì „í™˜: Return -> Idle");
             transform.position = _startPosition;
             CurrentState = EnemyState.Idle;
             return;
         }
 
-        // ÀüÀÌ: ÇÃ·¹ÀÌ¾î¿Í °¡±î¿ö Áö¸é -> Trace
+        // ì „ì´: í”Œë ˆì´ì–´ì™€ ê°€ê¹Œì›Œ ì§€ë©´ -> Trace
         if (Vector3.Distance(transform.position, _player.transform.position) < FindDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Return -> Trace");
+            Debug.Log("ìƒíƒœì „í™˜: Return -> Trace");
             CurrentState = EnemyState.Trace;
         }
 
 
-        // Çàµ¿: ½ÃÀÛ À§Ä¡·Î µÇµ¹¾Æ°£´Ù.
+        // í–‰ë™: ì‹œì‘ ìœ„ì¹˜ë¡œ ë˜ëŒì•„ê°„ë‹¤.
         Vector3 dir = (_startPosition - transform.position).normalized;
-        _characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        //_characterController.Move(dir * MoveSpeed * Time.deltaTime);
+        _agent.SetDestination(_startPosition);
     }
 
     private void Attack()
     {
-        // ÀüÀÌ: °ø°İ ¹üÀ§ º¸´Ù ¸Ö¾îÁö¸é -> Trace
+        // ì „ì´: ê³µê²© ë²”ìœ„ ë³´ë‹¤ ë©€ì–´ì§€ë©´ -> Trace
         if (Vector3.Distance(transform.position, _player.transform.position) >= AttackDistance)
         {
-            Debug.Log("»óÅÂÀüÈ¯: Attack -> Trace");
+            Debug.Log("ìƒíƒœì „í™˜: Attack -> Trace");
             CurrentState = EnemyState.Trace;
             _attackTimer = 0f;
             return;
         }
 
-        // Çàµ¿: ÇÃ·¹ÀÌ¾î¸¦ °ø°İÇÑ´Ù.
+        // í–‰ë™: í”Œë ˆì´ì–´ë¥¼ ê³µê²©í•œë‹¤.
         _attackTimer += Time.deltaTime;
         if (_attackTimer >= AttackCooltime)
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î °ø°İ!");
+            Debug.Log("í”Œë ˆì´ì–´ ê³µê²©!");
             _attackTimer = 0f;
         }
     }
 
     private void Knockback()
     {
-        // Çàµ¿: °ø°İÀ» ´çÇÏ¸é µÚ·Î ¹Ğ·Á³­´Ù.
+        // í–‰ë™: ê³µê²©ì„ ë‹¹í•˜ë©´ ë’¤ë¡œ ë°€ë ¤ë‚œë‹¤.
         Vector3 dir = (_player.transform.position - transform.position).normalized;
         _characterController.Move(dir * -_knockbackForce * Time.deltaTime);
         _knockbackTimer += Time.deltaTime;
@@ -273,19 +284,21 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator Damaged_Coroutine()
     {
-        // Çàµ¿: ÀÏÁ¤ ½Ã°£µ¿¾È ¸ØÃçÀÖ´Ù°¡ -> Trace
+        // í–‰ë™: ì¼ì • ì‹œê°„ë™ì•ˆ ë©ˆì¶°ìˆë‹¤ê°€ -> Trace
         //_damagedTimer += Time.deltaTime;
         //if (_damagedTimer >= DamagedTime)
         //{
         //    _damagedTimer = 0f;
-        //    Debug.Log("»óÅÂÀüÈ¯: Damaged -> Trace");
+        //    Debug.Log("ìƒíƒœì „í™˜: Damaged -> Trace");
         //    CurrentState = EnemyState.Trace;
         //}
 
-        //ÄÚ·çÆ¾ ¹æ½ÄÀ¸·Î º¯°æ
+        //ì½”ë£¨í‹´ ë°©ì‹ìœ¼ë¡œ ë³€ê²½
+        _agent.isStopped = true;
+        _agent.ResetPath();
         yield return new WaitForSeconds(DamagedTime);
-        Debug.Log("»óÅÂÀüÈ¯: Damaged -> Trace");
-        CurrentState = EnemyState.Trace;
+        Debug.Log("ìƒíƒœì „í™˜: Damaged -> Trace");
+        //CurrentState = EnemyState.Trace;
     }
 
     private IEnumerator Die_Coroutin()
