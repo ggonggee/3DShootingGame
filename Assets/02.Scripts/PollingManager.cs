@@ -2,19 +2,16 @@ using NUnit.Framework;
 using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
-public class PollingManager : MonoBehaviour
+public class PollingManager : Singleton<PollingManager>
 {
-    public static PollingManager Instance;
     public GameObject BombPrefab;
     public int PoolCount;
     public List<GameObject> BombPrefabList;
 
-
     private void Start()
     {
-        Instance = this;
-
         for(int i = 0; i < PoolCount; i++)
         {
             GameObject bombPrefab = Instantiate(BombPrefab,transform);

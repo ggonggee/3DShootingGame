@@ -2,10 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
-    public static UIManager Instance { get; private set; }
-
     [Header("슬라이더")]
     [SerializeField] private Slider _staminaSlider;
     [SerializeField] private Slider _reloadSlider;
@@ -13,19 +11,6 @@ public class UIManager : MonoBehaviour
 
     public TextMeshProUGUI BombCountText;
     public TextMeshProUGUI BulletCountText;
-
-    private void Awake()
-    {
-        // 싱글턴 초기화
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     public void SetStamina(float current, float max)
     {
