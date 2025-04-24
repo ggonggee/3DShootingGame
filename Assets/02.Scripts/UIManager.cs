@@ -1,10 +1,10 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : Singleton<UIManager>
 {
-    [Header("½½¶óÀÌ´õ")]
+    [Header("ìŠ¬ë¼ì´ë”")]
     [SerializeField] private Slider _staminaSlider;
     [SerializeField] private Slider _reloadSlider;
 
@@ -25,13 +25,13 @@ public class UIManager : Singleton<UIManager>
     {
         if(BombCountText != null)
         {
-            BombCountText.text = $"ÆøÅº °³¼ö: {current}/{max}";
+            BombCountText.text = $"í­íƒ„ ê°œìˆ˜: {current}/{max}";
         }
     }
 
     public void SetBullet(int bullet, int max)
     {
-        BulletCountText.text = $"ÅºÈ¯ : {bullet}/{max}";
+        BulletCountText.text = $"íƒ„í™˜ : {bullet}/{max}";
     }
 
     public void SetReload(float value, float max, bool isReloading)

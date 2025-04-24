@@ -1,4 +1,4 @@
-using NUnit.Framework;
+ï»¿using NUnit.Framework;
 using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ public class PollingManager : Singleton<PollingManager>
             }
         }
 
-        GameObject newObj = Instantiate(BombPrefab, transform); // ¶Ç´Â ´Ù¸¥ ±âº» ÇÁ¸®ÆÕ
+        GameObject newObj = Instantiate(BombPrefab, transform); // ë˜ëŠ” ë‹¤ë¥¸ ê¸°ë³¸ í”„ë¦¬íŒ¹
         BombPrefabList.Add(newObj);
         return newObj;
     }
