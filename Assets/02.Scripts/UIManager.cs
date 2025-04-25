@@ -1,4 +1,6 @@
-﻿using TMPro;
+﻿using System.Collections;
+
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +10,28 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private Slider _staminaSlider;
     [SerializeField] private Slider _reloadSlider;
 
-
     public TextMeshProUGUI BombCountText;
     public TextMeshProUGUI BulletCountText;
+    public Image BloodIamge;
+    private float BloodIDuration = 0.05f;
+
+    public void BooldEffect()
+    {
+        BloodIamge.color = new Color(1f, 1f, 1f, 1f);
+        StartCoroutine(BloodEffectDuation());
+    
+    }    IEnumerator BloodEffectDuation()
+
+    {
+        float alpha = BloodIamge.color.a;
+        while (BloodIamge.color.a >= 0)
+        {
+            yield return new WaitForSeconds(BloodIDuration);
+            alpha -= 0.1f;
+            BloodIamge.color = new Color(1f, 1f, 1f, alpha);
+            Debug.Log("여기에 걸리나");
+        }
+    }
 
     public void SetStamina(float current, float max)
     {

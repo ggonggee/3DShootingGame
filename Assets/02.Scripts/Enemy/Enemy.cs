@@ -50,7 +50,10 @@ public class Enemy : MonoBehaviour, IDamageable
     public float MoveSpeed = 3.3f;   // 이동 속도
     public float AttackCooltime = 2f;     // 공격 쿨타임
     private float _attackTimer = 0f;     // ㄴ 체크기
+    private float _attackDelay = 0.5f;
+
     public int Health = 100;
+    public int EnemyDamage = 10;
     public float DamagedTime = 0.5f;   // 경직 시간
     public float _dethTime = 5f;
     public float MinDistance = 0.1f;
@@ -323,12 +326,24 @@ public class Enemy : MonoBehaviour, IDamageable
         _agent.isStopped = true;
         _agent.ResetPath();
         // 행동: 플레이어를 공격한다.
-        _attackTimer += Time.deltaTime;
-        if (_attackTimer >= AttackCooltime)
+        _attackTimer -= Time.deltaTime;
+        if (_attackTimer <= 0 )
         {
+            _attackTimer = AttackCooltime;
             Debug.Log("플레이어 공격!");
-            _attackTimer = 0f;
-            SetAnimation(CurrentState);
+            StartCoroutine(AttackDelay());
+        }
+    }
+
+    private IEnumerator AttackDelay()
+    {
+        SetAnimation(CurrentState);
+        yield return new WaitForSeconds(_attackDelay);
+        if (_player.TryGetComponent<IDamageable>(out IDamageable idamageable))
+        {
+            Damage damage = new Damage();
+            damage.Value = 10;
+            idamageable.TakeDamage(damage);
         }
     }
 
