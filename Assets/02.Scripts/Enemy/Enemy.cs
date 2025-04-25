@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-
+using UnityEngine.UI;
 
 public enum EnemyType
 {
@@ -52,7 +52,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _attackTimer = 0f;     // ㄴ 체크기
     private float _attackDelay = 0.5f;
 
-    public int Health = 100;
+    public int CurrentHealth = 0;
+    public int MaxHealth = 100;
     public int EnemyDamage = 10;
     public float DamagedTime = 0.5f;   // 경직 시간
     public float _dethTime = 5f;
@@ -62,6 +63,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _knockbackDuration = 0.1f;
     private float _knockbackTimer = 0;
 
+    [Header("HP")]
+    public Slider HPSlider;
 
     //일정시간이 있으면 다른 곳으로 이동한다.
     [Header("패트롤")]
@@ -85,7 +88,6 @@ public class Enemy : MonoBehaviour, IDamageable
             ReturnDistance = 10000;
             //CurrentState = EnemyState.Trace;
             //SetAnimation(EnemyState.Die);
-
         }
 
         _agent = GetComponent<NavMeshAgent>();
@@ -94,7 +96,12 @@ public class Enemy : MonoBehaviour, IDamageable
         _startPosition = transform.position;
         _characterController = GetComponent<CharacterController>();
         _player = GameObject.FindGameObjectWithTag("Player");
+        CurrentHealth = MaxHealth;
+        HPSlider.maxValue = MaxHealth;
+        HPSlider.value = MaxHealth;
     }
+
+
 
 
     private void Update()
@@ -106,7 +113,7 @@ public class Enemy : MonoBehaviour, IDamageable
         //    return;
         //}
 
-
+        HPSlider.transform.LookAt(Camera.main.transform);
 
         //나의 현재 상태에 따라 상태 함수를 호출한다.
         switch (CurrentState)
@@ -171,9 +178,12 @@ public class Enemy : MonoBehaviour, IDamageable
             {
                 return;
             }
-        Health -= damage.Value;
+        CurrentHealth -= damage.Value;
 
-        if(Health <= 0)
+        HPSlider.value =  CurrentHealth;
+        
+
+        if (CurrentHealth <= 0)
         {
             Debug.Log($"상태전환: {CurrentState} -> Die");
             CurrentState = EnemyState.Die;
@@ -191,7 +201,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void TakeKnockback(Damage damage)
     {
-        Health -= damage.Value;
+        CurrentHealth -= damage.Value;
 
         Debug.Log($"상태 전환 {CurrentState} -> Knockback");
         _knockbackTimer = 0;

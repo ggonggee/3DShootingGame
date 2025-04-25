@@ -30,7 +30,6 @@ public class PlayerFire : MonoBehaviour
     public float MaxHoldTime = 2f;    //최대 충전 시간(예: 2초) — 이 이상은 더 안 늘어남
     public float ThrowPower = 15f; // 던지는 힘
     private float _holdStartTime; //마우스를 누른 시간(Time.time)을 저장
-    private bool _isHolding;      //마우스를 누르고 있는 중인지 여부
     private const float ThrowPowerMultiplier = 1.5f;
 
     // 목표: 마우스 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다. 
@@ -59,9 +58,12 @@ public class PlayerFire : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameMove != GameMode.Run)
+        {
+            return;
+        }
         if (Input.GetMouseButtonDown(1))
         {
-            _isHolding = true;
             _holdStartTime = Time.time;
         }
 
@@ -69,7 +71,7 @@ public class PlayerFire : MonoBehaviour
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonUp(1))
         {
-            _isHolding = false;
+
             ThrowPower = MinThrowPower* Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
             ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
 

@@ -1,12 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class PlayerRotate : MonoBehaviour
 {
-    public float RotationSpeed = 150f; // Ä«¸Ş¶ó¿Í È¸Àü ¼Óµµ¿Í °°¾Æ¾ß ÇÑ´Ù.
+    public float RotationSpeed = 150f; // ì¹´ë©”ë¼ì™€ íšŒì „ ì†ë„ì™€ ê°™ì•„ì•¼ í•œë‹¤.
 
     private float _rotationX = 0;
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameMove != GameMode.Run)
+        {
+            return;
+        }
         float mouseX = Input.GetAxis("Mouse X");
 
         _rotationX += mouseX * RotationSpeed * Time.deltaTime;

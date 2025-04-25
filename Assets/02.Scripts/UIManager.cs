@@ -9,11 +9,18 @@ public class UIManager : Singleton<UIManager>
     [Header("슬라이더")]
     [SerializeField] private Slider _staminaSlider;
     [SerializeField] private Slider _reloadSlider;
+    public Slider PlayerHpSlider;
 
     public TextMeshProUGUI BombCountText;
     public TextMeshProUGUI BulletCountText;
     public Image BloodIamge;
     private float BloodIDuration = 0.05f;
+
+
+    public void SetPlayerHP(float hp)
+    {
+        PlayerHpSlider.value = hp;
+    }
 
     public void BooldEffect()
     {
@@ -29,7 +36,6 @@ public class UIManager : Singleton<UIManager>
             yield return new WaitForSeconds(BloodIDuration);
             alpha -= 0.1f;
             BloodIamge.color = new Color(1f, 1f, 1f, alpha);
-            Debug.Log("여기에 걸리나");
         }
     }
 

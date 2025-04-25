@@ -16,17 +16,20 @@ public class MinimapCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-
+        if (GameManager.Instance.CurrentGameMove != GameMode.Run)
+        {
+            return;
+        }
         Vector3 newPosition = Target.position;
-        newPosition.y += YOffect;
+            newPosition.y += YOffect;
 
-        transform.position = newPosition;
+            transform.position = newPosition;
 
-        //플레이어가 Y축 회전한만큼 미니맵 
-        Vector3 newEulerAngles = Target.eulerAngles;
-        newEulerAngles.x = 90;
-        newEulerAngles.z = 0;
-        transform.eulerAngles = newEulerAngles;
+            //플레이어가 Y축 회전한만큼 미니맵 
+            Vector3 newEulerAngles = Target.eulerAngles;
+            newEulerAngles.x = 90;
+            newEulerAngles.z = 0;
+            transform.eulerAngles = newEulerAngles;
     }
 
 

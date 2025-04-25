@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
@@ -36,6 +36,8 @@ public class PlayerMove : MonoBehaviour
 
     private CharacterController _controller;
 
+    public bool isDeath;
+
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -44,6 +46,10 @@ public class PlayerMove : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.CurrentGameMove != GameMode.Run)
+        {
+            return;
+        }
         UIManager.Instance.SetStamina(Stamina, MaxStamina);
 
         bool isTouchingWall = (_controller.collisionFlags & CollisionFlags.Sides) != 0;
