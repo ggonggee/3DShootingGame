@@ -137,33 +137,24 @@ public class PlayerFire : MonoBehaviour
                 BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
                 BulletEffect.Play();
 
-                if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+
+                //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                // 총알을 맞은 친구가 IDamageable 구현체라면...
+                if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
                 {
-                    Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+                    //Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
 
                     Damage damage = new Damage();
                     damage.Value = 10;
                     damage.From = this.gameObject;
 
-                    enemy.TakeDamage(damage);
+                        //enemy.TakeDamage(damage);
+                        damageable.TakeDamage(damage);
                 }
-
-                    if (hitInfo.collider.gameObject.CompareTag("Barrel"))
-                    {
-                        Barrel barrel = hitInfo.collider.GetComponent<Barrel>();
-
-                        Damage damage = new Damage();
-                        damage.Value = 10;
-                        damage.From = this.gameObject;
-                        barrel.TakeDamage(damage);
-                    }
-
 
                     // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
 
                 }
-
-
                 // Ray: 레이저( 시작위치, 방향)
                 // RayCast : 레이저를 발사
                 // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체

@@ -637,8 +637,8 @@ GameObject:
   - component: {fileID: 273070582}
   - component: {fileID: 273070581}
   - component: {fileID: 273070580}
-  - component: {fileID: 273070585}
   - component: {fileID: 273070584}
+  - component: {fileID: 273070585}
   - component: {fileID: 273070586}
   m_Layer: 7
   m_Name: Enemy
@@ -646,7 +646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &273070580
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -732,7 +732,7 @@ Transform:
   m_GameObject: {fileID: 273070579}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: 41.7}
+  m_LocalPosition: {x: 1, y: 1, z: 26.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -776,8 +776,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc13ed0178c640e43a794faebe1698b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Type: 0
   CurrentState: 0
-  _player: {fileID: 0}
   FindDistance: 10000
   ReturnDistance: 10
   AttackDistance: 2.5
@@ -2043,7 +2043,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4388,6 +4389,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &1498238475
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2172116645741430092, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_Name
+      value: Enemy (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 24.62
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
 --- !u!1 &1519023268
 GameObject:
   m_ObjectHideFlags: 0
@@ -4430,7 +4488,10 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
   m_sharedMaterial: {fileID: -5700877586607877126, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -5700877586607877126, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: 0}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4524,6 +4585,54 @@ RectTransform:
   m_AnchoredPosition: {x: 310, y: 367}
   m_SizeDelta: {x: 464.38074, y: 93.31781}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1522519484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1522519486}
+  - component: {fileID: 1522519485}
+  m_Layer: 0
+  m_Name: EnemysSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1522519485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1522519484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd85bdb387a92994d8e5257714cc47b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnemyPrefab: {fileID: 2172116645741430092, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+  SpawnMinTime: 3
+  SpawnMaxTime: 7
+  Radius: 5
+--- !u!4 &1522519486
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1522519484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.9, y: 0, z: 36.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1559063925
 GameObject:
   m_ObjectHideFlags: 0
@@ -4597,7 +4706,10 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
   m_sharedMaterial: {fileID: -5700877586607877126, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: -5700877586607877126, guid: 60830bb20a47ff544a3f01363426da07, type: 2}
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: 0}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -4907,7 +5019,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -5793,6 +5906,7 @@ GameObject:
   - component: {fileID: 531754246842456334}
   - component: {fileID: 718069543}
   - component: {fileID: 718069544}
+  - component: {fileID: 837742624236676190}
   m_Layer: 0
   m_Name: GreenBarrel
   m_TagString: Barrel
@@ -5800,6 +5914,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!208 &837742624236676190
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 837742624236676189}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!4 &928583266631609962
 Transform:
   m_ObjectHideFlags: 0
@@ -5827,6 +5957,7 @@ GameObject:
   - component: {fileID: 223052153365903579}
   - component: {fileID: 1141971543665902985}
   - component: {fileID: 451964758}
+  - component: {fileID: 1141971543665902986}
   m_Layer: 0
   m_Name: SteelBarrel
   m_TagString: Barrel
@@ -5861,6 +5992,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &1141971543665902986
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1141971543665902984}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!23 &1254590703613825633
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6007,8 +6154,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1432721151634549970}
   - component: {fileID: 1470624524417420091}
-  - component: {fileID: 112019944}
   - component: {fileID: 1777194414614902377}
+  - component: {fileID: 112019944}
+  - component: {fileID: 1777194414614902378}
   m_Layer: 0
   m_Name: BlueBarrel
   m_TagString: Barrel
@@ -6043,6 +6191,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &1777194414614902378
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1777194414614902376}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!4 &1986712479573515658
 Transform:
   m_ObjectHideFlags: 0
@@ -6269,6 +6433,7 @@ GameObject:
   - component: {fileID: 3722899824186675214}
   - component: {fileID: 4098756176642214604}
   - component: {fileID: 1029792881}
+  - component: {fileID: 4098756176642214605}
   m_Layer: 0
   m_Name: YellowBarrel 1
   m_TagString: Barrel
@@ -6319,6 +6484,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &4098756176642214605
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3722899824186675313}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!23 &4629582112173195030
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6463,6 +6644,7 @@ GameObject:
   - component: {fileID: 6474791550878378148}
   - component: {fileID: 6796404495337328462}
   - component: {fileID: 680869771}
+  - component: {fileID: 6796404495337328463}
   m_Layer: 0
   m_Name: LGreenDirtyBarrel
   m_TagString: Barrel
@@ -6556,6 +6738,7 @@ GameObject:
   - component: {fileID: 6212588509881218169}
   - component: {fileID: 6554678664513554731}
   - component: {fileID: 359338843}
+  - component: {fileID: 6554678664513554732}
   m_Layer: 0
   m_Name: RuinedSteelBarrel
   m_TagString: Barrel
@@ -6590,6 +6773,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &6554678664513554732
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6554678664513554730}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!4 &6796404495337328461
 Transform:
   m_ObjectHideFlags: 0
@@ -6633,6 +6832,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &6796404495337328463
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6132351615317005815}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!23 &6979072234619735419
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6805,6 +7020,7 @@ GameObject:
   - component: {fileID: 8167282835619652094}
   - component: {fileID: 8796608534783556424}
   - component: {fileID: 1021663797}
+  - component: {fileID: 8796608534783556425}
   m_Layer: 0
   m_Name: RedBarrel 1
   m_TagString: Barrel
@@ -6839,6 +7055,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!208 &8796608534783556425
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8796608534783556423}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0
 --- !u!33 &9148700421632296799
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -6867,3 +7099,5 @@ SceneRoots:
   - {fileID: 402309823}
   - {fileID: 186205999}
   - {fileID: 2994989338241187850}
+  - {fileID: 1522519486}
+  - {fileID: 1498238475}

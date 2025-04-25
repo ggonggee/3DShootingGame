@@ -1,33 +1,44 @@
 ﻿using System;
 using System.Collections;
 using Unity.Android.Gradle.Manifest;
+using Unity.VisualScripting;
+
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
+
+public enum EnemyType
+{
+    Tracer,
+    patroller,
+}
 
 // 인공지능: 사랑처럼 똑똑하게 행동하는 알고리즘
 // - 반응형/계획형 -> 규칙 기반 인공지능 (전통적인 방식)
 //               ->   ㄴ 제어문(조건문, 반복문)
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDamageable
 {
     // 1. 상태를 열거형으로 정의한다.
     public enum EnemyState
     {
         Idle,
-        patrol,
+        Patrol,
         Trace,
         Return,
         Attack,
         Damaged,
         Knockback,
         Die,
+        Count,
     }
 
+    [Header("적타입")]
+    public EnemyType Type = EnemyType.Tracer;
     // 2. 현재 상태를 지정한다.
-    public EnemyState CurrentState = EnemyState.Trace;
-    [SerializeField]
+    public EnemyState CurrentState = EnemyState.Idle;
     private GameObject _player;                       // 플레이어
     private CharacterController _characterController; // 캐릭터 컨트롤러
     private NavMeshAgent _agent;                      // 네비메쉬 에이젼드
@@ -41,7 +52,7 @@ public class Enemy : MonoBehaviour
     private float _attackTimer = 0f;     // ㄴ 체크기
     public int Health = 100;
     public float DamagedTime = 0.5f;   // 경직 시간
-    public float _dethTime = 1f;
+    public float _dethTime = 5f;
     public float MinDistance = 0.1f;
 
     private float _knockbackForce = 30f;
@@ -56,9 +67,24 @@ public class Enemy : MonoBehaviour
     private float _patrolTimer;
     private int _PatrolPositionIndex = 0;
 
+    private Animator _enemyAnimator;
+
+    private void Awake()
+    {
+        _enemyAnimator = transform.GetComponentInChildren<Animator>();
+    }
 
     private void Start()
     {
+        if (Type == EnemyType.Tracer)
+        {
+            FindDistance = 10000;
+            ReturnDistance = 10000;
+            //CurrentState = EnemyState.Trace;
+            //SetAnimation(EnemyState.Die);
+
+        }
+
         _agent = GetComponent<NavMeshAgent>();
         _agent.speed = MoveSpeed;
 
@@ -70,70 +96,93 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        Vector3 dir = _player.transform.position - transform.position;
-        _agent.SetDestination(_player.transform.position);
-
-        // 나의 현재 상태에 따라 상태 함수를 호출한다.
-        //switch (CurrentState)
+        //if(Type  == EnemyType.Tracer)
         //{
-        //    case EnemyState.Idle:
-        //        {
-        //            Idle();
-        //            break;
-        //        }
-        //    case EnemyState.patrol:
-        //        {
-        //            Patrol();
-        //            break;
-        //        }
-
-        //    case EnemyState.Trace:
-        //        {
-        //            Trace();
-        //            break;
-        //        }
-
-        //    case EnemyState.Return:
-        //        {
-        //            Return();
-        //            break;
-        //        }
-
-        //    case EnemyState.Attack:
-        //        {
-        //            Attack();
-        //            break;
-        //        }
-
-        //    case EnemyState.Knockback:
-        //        {
-        //            Knockback();
-        //            break;
-        //        }
+        //    Vector3 dir = _player.transform.position - transform.position;
+        //    _agent.SetDestination(_player.transform.position);
+        //    return;
         //}
+
+
+
+        //나의 현재 상태에 따라 상태 함수를 호출한다.
+        switch (CurrentState)
+        {
+            case EnemyState.Idle:
+                {
+                    Idle();
+  
+                    break;
+                }
+            case EnemyState.Patrol:
+                {
+                    Patrol();
+                    break;
+                }
+
+            case EnemyState.Trace:
+                {
+                    Trace();
+                    break;
+                }
+
+            case EnemyState.Return:
+                {
+                    Return();
+                    break;
+                }
+
+            case EnemyState.Attack:
+                {
+                    Attack();
+                    break;
+                }
+
+            case EnemyState.Knockback:
+                {
+                    Knockback();
+                    break;
+                }
+        }
+    }
+
+
+    private void SetAnimation( EnemyState enemyState )
+    {
+        //for (int i = 0; i < (int)EnemyState.Count; i++)
+        //{
+        //    if(i == (int)enemyState)
+        //    {
+        //        Debug.Log($"{ enemyState.ToSafeString()} 이고 {i == (int)enemyState}");
+        //    }
+        //    _enemyAnimator.SetBool(enemyState.ToString(), i == (int)enemyState);
+        //}
+        _enemyAnimator.SetTrigger(enemyState.ToSafeString());
     }
 
     public void TakeDamage(Damage damage)
     {
         //사망했거나 공격받고 있는 중이라면..
-        if(CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
-        {
-            return;
-        }
+        if(CurrentState == EnemyState.Die)
+            //if (CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
+            {
+                return;
+            }
         Health -= damage.Value;
 
         if(Health <= 0)
         {
             Debug.Log($"상태전환: {CurrentState} -> Die");
             CurrentState = EnemyState.Die;
+            SetAnimation(EnemyState.Die);
             StartCoroutine(Die_Coroutin());
             return;
         }
 
-        //Debug.Log($"상태전환: {CurrentState} -> Damaged");
-
+        Debug.Log($"상태전환: {CurrentState} -> Damaged");
         //_damagedTimer = 0f;
-        //CurrentState = EnemyState.Damaged;
+        CurrentState = EnemyState.Damaged;
+        SetAnimation(CurrentState);
         StartCoroutine(Damaged_Coroutine());
     }
 
@@ -158,6 +207,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Idle -> Trace");
             CurrentState = EnemyState.Trace;
+            SetAnimation(CurrentState);
         }
 
         // 전이: 시간이 지나면 패트롤을 한다.
@@ -172,7 +222,7 @@ public class Enemy : MonoBehaviour
             {
                 _PatrolPositionIndex = 0;
             }
-            CurrentState = EnemyState.patrol;
+            CurrentState = EnemyState.Patrol;
         }
 
 
@@ -184,6 +234,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Patrol -> Trace");
             CurrentState = EnemyState.Trace;
+            SetAnimation(CurrentState);
         }
 
         // 행동 : 페트롤 포인트를 왔다 갔다 한다.
@@ -197,6 +248,7 @@ public class Enemy : MonoBehaviour
             Debug.Log("상태전환: Patrol -> Idle");
             transform.position =_startPosition;
             CurrentState = EnemyState.Idle;
+            SetAnimation(CurrentState);
         }
     }
 
@@ -207,6 +259,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Trace -> Return");
             CurrentState = EnemyState.Return;
+            SetAnimation(CurrentState);
             return;
         }
 
@@ -215,6 +268,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Trace -> Attack");
             CurrentState = EnemyState.Attack;
+            SetAnimation(CurrentState);
             return;
         }
 
@@ -232,6 +286,7 @@ public class Enemy : MonoBehaviour
             Debug.Log("상태전환: Return -> Idle");
             transform.position = _startPosition;
             CurrentState = EnemyState.Idle;
+            SetAnimation(CurrentState);
             return;
         }
 
@@ -240,6 +295,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Return -> Trace");
             CurrentState = EnemyState.Trace;
+            SetAnimation(CurrentState);
         }
 
 
@@ -247,6 +303,7 @@ public class Enemy : MonoBehaviour
         Vector3 dir = (_startPosition - transform.position).normalized;
         //_characterController.Move(dir * MoveSpeed * Time.deltaTime);
         _agent.SetDestination(_startPosition);
+
     }
 
     private void Attack()
@@ -256,6 +313,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("상태전환: Attack -> Trace");
             CurrentState = EnemyState.Trace;
+            SetAnimation(CurrentState);
             _attackTimer = 0f;
             return;
         }
@@ -266,6 +324,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("플레이어 공격!");
             _attackTimer = 0f;
+            SetAnimation(CurrentState);
         }
     }
 
@@ -279,6 +338,7 @@ public class Enemy : MonoBehaviour
         {
             _knockbackTimer = 0;
             CurrentState = EnemyState.Trace;
+            SetAnimation(CurrentState);
         }
     }
 
@@ -298,11 +358,13 @@ public class Enemy : MonoBehaviour
         _agent.ResetPath();
         yield return new WaitForSeconds(DamagedTime);
         Debug.Log("상태전환: Damaged -> Trace");
-        //CurrentState = EnemyState.Trace;
+        CurrentState = EnemyState.Trace;
+        SetAnimation(CurrentState);
     }
 
     private IEnumerator Die_Coroutin()
     {
+        SetAnimation(EnemyState.Die);
         yield return new WaitForSeconds(_dethTime);
         transform.gameObject.SetActive(false);
     }
