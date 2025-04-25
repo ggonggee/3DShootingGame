@@ -107,12 +107,12 @@ MonoBehaviour:
   CurrentState: 0
   FindDistance: 10000
   ReturnDistance: 10
-  AttackDistance: 2.5
+  AttackDistance: 3.5
   MoveSpeed: 3.3
   AttackCooltime: 2
   Health: 30
   DamagedTime: 0.5
-  _dethTime: 1
+  _dethTime: 10
   MinDistance: 0.1
   PatrolPositions:
   - {fileID: 0}

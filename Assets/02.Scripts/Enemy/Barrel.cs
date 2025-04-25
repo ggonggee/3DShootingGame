@@ -25,13 +25,15 @@ public class Barrel : MonoBehaviour, IDamageable
         Health -= damage.Value;
         if(Health <= 0)
         {
-            isDead = true;
+            if (isDead) { return; }
+            
             StartCoroutine(DistroyBarrel());
         }
     }
 
     IEnumerator DistroyBarrel()
     {
+        isDead = true;
         ParticleSystem effect = Instantiate(EffectPrefab,transform.position,Quaternion.identity);
         effect.Play();
         _rigidbody.AddForce(Vector3.up * ExplosionPower);
@@ -50,15 +52,12 @@ public class Barrel : MonoBehaviour, IDamageable
         Collider[] cols = Physics.OverlapSphere(transform.position, ExplodeRange);
         foreach (Collider col in cols)
         {
-            if (col.transform.TryGetComponent<IDamageable>(out IDamageable damageable))
+            if (col.transform.TryGetComponent<IDamageable>(out IDamageable damageable)  &&
+                col.transform.CompareTag("Barrel"))
             {
-                //Barrel barrel = col.transform.GetComponent<Barrel>();
-                //if (barrel.isDead == false)
-                //{
                     Damage damage = new Damage();
                     damage.Value = ExplosionDamage;
-                    damageable.TakeDamage(damage);
-                //}
+                    damageable.TakeDamage(damage);   
             }
 
             //if (col.transform.CompareTag("Enemy"))
@@ -67,7 +66,6 @@ public class Barrel : MonoBehaviour, IDamageable
             //    Damage damage = new Damage();
             //    damage.Value = ExplosionDamage;
             //    enemy.TakeDamage(damage);
-                
             //}
         }
 

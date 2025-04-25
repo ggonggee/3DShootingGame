@@ -266,6 +266,8 @@ public class Enemy : MonoBehaviour, IDamageable
         // 전이: 공격 범위 만큼 가까워 지면 -> Attack
         if (Vector3.Distance(transform.position, _player.transform.position) < AttackDistance)
         {
+            _agent.isStopped = true;
+            _agent.ResetPath();
             Debug.Log("상태전환: Trace -> Attack");
             CurrentState = EnemyState.Attack;
             SetAnimation(CurrentState);
@@ -318,6 +320,8 @@ public class Enemy : MonoBehaviour, IDamageable
             return;
         }
 
+        _agent.isStopped = true;
+        _agent.ResetPath();
         // 행동: 플레이어를 공격한다.
         _attackTimer += Time.deltaTime;
         if (_attackTimer >= AttackCooltime)
@@ -364,7 +368,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private IEnumerator Die_Coroutin()
     {
-        SetAnimation(EnemyState.Die);
+        _agent.isStopped = true;
+        _agent.ResetPath();
         yield return new WaitForSeconds(_dethTime);
         transform.gameObject.SetActive(false);
     }

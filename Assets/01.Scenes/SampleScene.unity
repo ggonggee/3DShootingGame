@@ -3014,7 +3014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1161547611
 Transform:
   m_ObjectHideFlags: 0
@@ -4397,9 +4397,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1814154219323097680, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: Health
+      value: 3000
+      objectReference: {fileID: 0}
     - target: {fileID: 2172116645741430092, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
       propertyPath: m_Name
       value: Enemy (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2172116645741430092, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6075707962515801279, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4601,7 +4609,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1522519485
 MonoBehaviour:
   m_ObjectHideFlags: 0
