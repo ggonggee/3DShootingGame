@@ -614,7 +614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2178294477454323711, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.21100003
+      value: -0.211
       objectReference: {fileID: 0}
     - target: {fileID: 2178294477454323711, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
       propertyPath: m_LocalPosition.z
@@ -652,10 +652,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Knife01_standardShader
       objectReference: {fileID: 0}
+    - target: {fileID: 4954375757346313408, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4954375757346313408, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1384173342}
   m_SourcePrefab: {fileID: 100100000, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
 --- !u!1 &186205997
 GameObject:
@@ -2176,6 +2183,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rifle04_standardShader
       objectReference: {fileID: 0}
+    - target: {fileID: 7623342917076809541, guid: e4d588ccd6459d145ae0ffecb82221c6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3634,6 +3645,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1077788607}
   m_CullTransparentMesh: 1
+--- !u!1 &1099662650 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7623342917076809541, guid: e4d588ccd6459d145ae0ffecb82221c6, type: 3}
+  m_PrefabInstance: {fileID: 783527427}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1121920247
 GameObject:
   m_ObjectHideFlags: 0
@@ -4036,6 +4052,7 @@ GameObject:
   - component: {fileID: 1209235951}
   - component: {fileID: 1209235953}
   - component: {fileID: 1209235954}
+  - component: {fileID: 1209235955}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -4195,6 +4212,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FirePosition: {fileID: 1408179242}
+  Weapon:
+  - {fileID: 1099662650}
+  - {fileID: 1384173339}
+  CurrentWeaponMode: 0
   Damage: 0
   BulletCount: 0
   MaxBulletCount: 50
@@ -4225,6 +4246,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CurrentHealth: 0
   MaxHealth: 100
+--- !u!95 &1209235955
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209235945}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &1217277013 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6487471369976635201, guid: e4d588ccd6459d145ae0ffecb82221c6, type: 3}
@@ -4556,7 +4599,7 @@ Transform:
   m_GameObject: {fileID: 1259168348}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8, z: -0.06}
+  m_LocalPosition: {x: 0, y: 0.456, z: -0.031}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5172,6 +5215,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1203768634}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1384173339 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4954375757346313408, guid: b65137912e5cacb47a1956c841eb8bbf, type: 3}
+  m_PrefabInstance: {fileID: 184832277}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1384173342
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384173339}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: baeede3e2e904a846bcd6656ac50d04d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1408179242
 GameObject:
   m_ObjectHideFlags: 0

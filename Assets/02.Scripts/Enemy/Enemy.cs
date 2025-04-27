@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public float FindDistance = 5f;     // 플레이어 발견 범위
     public float ReturnDistance = 5f;     // 적 복귀 범위
-    public float AttackDistance = 2.5f;   // 플레이어 공격 범위
+    public float AttackDistance = 1.5f;   // 플레이어 공격 범위
     public float MoveSpeed = 3.3f;   // 이동 속도
     public float AttackCooltime = 2f;     // 공격 쿨타임
     private float _attackTimer = 0f;     // ㄴ 체크기

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
-enum WeaponMode
+public enum WeaponMode
 {
     Gun,
     Nife,
@@ -12,6 +12,11 @@ public class PlayerFire : MonoBehaviour
 {
 
     public GameObject FirePosition;
+    public GameObject[] Weapon;
+    public WeaponMode CurrentWeaponMode;
+    private float _knifeDestance = 5f;
+    private float _knifeAngle = 90f;
+
 
     [Header("총알")]
     public int Damage;
@@ -60,7 +65,6 @@ public class PlayerFire : MonoBehaviour
         UIManager.Instance.SetBomb(BombCount, MaxBombCount);
         UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
         Cursor.lockState = CursorLockMode.Locked;
-        
     }
 
     private void Update()
@@ -69,9 +73,31 @@ public class PlayerFire : MonoBehaviour
         {
             return;
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            CurrentWeaponMode = WeaponMode.Gun;
+            Debug.Log("넘버키 1이 눌러 졌다");
+            for(int i = 0; i < Weapon.Length; i++)
+            {
+                Weapon[i].SetActive((int)CurrentWeaponMode == i);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            CurrentWeaponMode = WeaponMode.Nife;
+            Debug.Log("넘버키 2이 눌러 졌다");
+            for (int i = 0; i < Weapon.Length; i++)
+            {
+                Weapon[i].SetActive((int)CurrentWeaponMode == i);
+            }
+        }
+
         if (Input.GetMouseButtonDown(1))
         {
             _holdStartTime = Time.time;
+
         }
 
         // 2. 오른쪽 버튼 입력 받기
@@ -119,55 +145,94 @@ public class PlayerFire : MonoBehaviour
             UIManager.Instance.SetReload(ReloadTimer,ReloadInterval, isReLoading);
         }
 
-        // 1. 왼쪽 버튼 입력 받기
-        if (Input.GetMouseButton(0) && BulletCount > 0)
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            ShotTimer -= Time.deltaTime;
-            if(ShotTimer < 0)
+            if (CurrentWeaponMode == WeaponMode.Nife)
             {
-                BulletCount--;
-                UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
-                ShotTimer = ShotInterval;
-                isReLoading = false;
-                UIManager.Instance.SetReload(ReloadTimer, ReloadInterval, isReLoading);
+                Animator ani = Weapon[(int)WeaponMode.Nife].GetComponent<Animator>();
+                ani.SetTrigger("Attack");
+                Collider[] cols = Physics.OverlapSphere(transform.position, _knifeDestance, LayerMask.GetMask("Enemy"));
 
-                // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
-                Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
-                
-            // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
-            RaycastHit hitInfo = new RaycastHit();
-
-            // 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
-            bool isHit = Physics.Raycast(ray, out hitInfo);
-            if (isHit) //데이터가 있다면 (부딛혔다면
-            {
-                // 피격 이펙트 생성(표시)
-                BulletEffect.transform.position = hitInfo.point;
-                BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
-                BulletEffect.Play();
-
-
-                //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
-                // 총알을 맞은 친구가 IDamageable 구현체라면...
-                if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                for (int i = 0; i < cols.Length; i++)
                 {
-                    //Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+                    Vector3 target = cols[i].transform.position - transform.position;
+                    target.y = 0; // 높이 차이는 무시할 경우
 
-                    Damage damage = new Damage();
-                    damage.Value = 10;
-                    damage.From = this.gameObject;
+                    if (cols[i].CompareTag("Enemy"))
+                    {
+                        float angle = Vector3.Angle(transform.forward, target);
+                        if (angle > _knifeAngle * 0.5f)
+                        {
+                            Debug.Log("칼이 안닿는다");
+                            return;
+                        }
 
-                        //enemy.TakeDamage(damage);
-                        damageable.TakeDamage(damage);
+                        if (cols[i].TryGetComponent<IDamageable>(out IDamageable damageAble))
+                        {
+                            Debug.Log("칼 맞았다!");
+                            Damage damage = new Damage();
+                            damage.Value = 100;
+                            damageAble.TakeDamage(damage);
+                        }
+                    }
                 }
+            }
+        }
 
-                    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
 
+        // 1. 왼쪽 버튼 입력 받기
+        if (Input.GetMouseButton(0))
+        {
+            if(CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
+            {
+                ShotTimer -= Time.deltaTime;
+            
+                if(ShotTimer < 0)
+                {
+                    BulletCount--;
+                    UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
+                    ShotTimer = ShotInterval;
+                    isReLoading = false;
+                    UIManager.Instance.SetReload(ReloadTimer, ReloadInterval, isReLoading);
+
+                    // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
+                    Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
+                
+                // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
+                RaycastHit hitInfo = new RaycastHit();
+
+                // 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
+                bool isHit = Physics.Raycast(ray, out hitInfo);
+                if (isHit) //데이터가 있다면 (부딛혔다면
+                {
+                    // 피격 이펙트 생성(표시)
+                    BulletEffect.transform.position = hitInfo.point;
+                    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
+                    BulletEffect.Play();
+
+
+                    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                    // 총알을 맞은 친구가 IDamageable 구현체라면...
+                    if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                    {
+                        //Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+
+                        Damage damage = new Damage();
+                        damage.Value = 10;
+                       damage.From = this.gameObject;
+
+                            //enemy.TakeDamage(damage);
+                            damageable.TakeDamage(damage);
+                    }
+
+                        // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
+
+                    }
+                    // Ray: 레이저( 시작위치, 방향)
+                    // RayCast : 레이저를 발사
+                    // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+                    Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
                 }
-                // Ray: 레이저( 시작위치, 방향)
-                // RayCast : 레이저를 발사
-                // RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
-                Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
             }
         }
     }

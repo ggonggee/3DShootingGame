@@ -320,7 +320,7 @@ MonoBehaviour:
   CurrentState: 0
   FindDistance: 10000
   ReturnDistance: 10
-  AttackDistance: 3.5
+  AttackDistance: 2.5
   MoveSpeed: 3.3
   AttackCooltime: 2
   CurrentHealth: 0
