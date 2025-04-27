@@ -324,7 +324,7 @@ MonoBehaviour:
   MoveSpeed: 3.3
   AttackCooltime: 2
   CurrentHealth: 0
-  MaxHealth: 100
+  MaxHealth: 30
   EnemyDamage: 10
   DamagedTime: 0.5
   _dethTime: 10

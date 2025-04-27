@@ -16,6 +16,10 @@ public class UIManager : Singleton<UIManager>
     public Image BloodIamge;
     private float BloodIDuration = 0.05f;
 
+    public GameObject ReadyPanel;
+    public TextMeshProUGUI ReadyText;
+    public GameObject GameOverPanel;
+
 
     public void SetPlayerHP(float hp)
     {

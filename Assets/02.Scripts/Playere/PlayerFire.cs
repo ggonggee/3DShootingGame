@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using static Unity.Burst.Intrinsics.X86.Avx;
 
+enum WeaponMode
+{
+    Gun,
+    Nife,
+    Count
+}
+
 public class PlayerFire : MonoBehaviour
 {
 
