@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+
 using Unity.Android.Gradle.Manifest;
 using Unity.VisualScripting;
 
@@ -74,7 +75,6 @@ public class Enemy : MonoBehaviour, IDamageable
     private int _PatrolPositionIndex = 0;
 
     private Animator _enemyAnimator;
-
     private void Awake()
     {
         _enemyAnimator = transform.GetComponentInChildren<Animator>();
@@ -101,9 +101,6 @@ public class Enemy : MonoBehaviour, IDamageable
         HPSlider.value = MaxHealth;
     }
 
-
-
-
     private void Update()
     {
         //사망했거나 공격받고 있는 중이라면..
@@ -128,7 +125,7 @@ public class Enemy : MonoBehaviour, IDamageable
             case EnemyState.Idle:
                 {
                     Idle();
-  
+
                     break;
                 }
             case EnemyState.Patrol:
@@ -164,16 +161,8 @@ public class Enemy : MonoBehaviour, IDamageable
     }
 
 
-    private void SetAnimation( EnemyState enemyState )
+    private void SetAnimation(EnemyState enemyState)
     {
-        //for (int i = 0; i < (int)EnemyState.Count; i++)
-        //{
-        //    if(i == (int)enemyState)
-        //    {
-        //        Debug.Log($"{ enemyState.ToSafeString()} 이고 {i == (int)enemyState}");
-        //    }
-        //    _enemyAnimator.SetBool(enemyState.ToString(), i == (int)enemyState);
-        //}
         _enemyAnimator.SetTrigger(enemyState.ToSafeString());
     }
 
@@ -185,16 +174,16 @@ public class Enemy : MonoBehaviour, IDamageable
         }
 
         CurrentHealth -= damage.Value;
-
-        HPSlider.value =  CurrentHealth;
-        
+        HPSlider.value = CurrentHealth;
 
         if (CurrentHealth <= 0)
         {
             Debug.Log($"상태전환: {CurrentState} -> Die");
+            _agent.isStopped = true;
+            _agent.ResetPath();
             CurrentState = EnemyState.Die;
             SetAnimation(EnemyState.Die);
-            StartCoroutine(Die_Coroutin());
+            StartCoroutine(Die_Coroutine());
             return;
         }
 
@@ -202,7 +191,7 @@ public class Enemy : MonoBehaviour, IDamageable
         //_damagedTimer = 0f;
         CurrentState = EnemyState.Damaged;
         SetAnimation(CurrentState);
-        StartCoroutine(Damaged_Coroutine());
+        //StartCoroutine(Damaged_Coroutine());
     }
 
     public void TakeKnockback(Damage damage)
@@ -213,7 +202,6 @@ public class Enemy : MonoBehaviour, IDamageable
         _knockbackTimer = 0;
         CurrentState = EnemyState.Knockback;
     }
-
 
     // 3. 상태 함수들을 구현한다.
 
@@ -226,25 +214,23 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             Debug.Log("상태전환: Idle -> Trace");
             CurrentState = EnemyState.Trace;
-            //SetAnimation(CurrentState);
+            SetAnimation(CurrentState);
         }
 
         // 전이: 시간이 지나면 패트롤을 한다.
         _patrolTimer += Time.deltaTime;
-        if(_patrolTimer > _patrolInterval)
+        if (_patrolTimer > _patrolInterval)
         {
             _patrolTimer = 0;
             Debug.Log("상태전환: Idle -> Patrol");
             _startPosition = PatrolPositions[_PatrolPositionIndex].position;
             _PatrolPositionIndex++;
-            if(_PatrolPositionIndex >= PatrolPositions.Length)
+            if (_PatrolPositionIndex >= PatrolPositions.Length)
             {
                 _PatrolPositionIndex = 0;
             }
             CurrentState = EnemyState.Patrol;
         }
-
-
     }
     private void Patrol()
     {
@@ -262,10 +248,10 @@ public class Enemy : MonoBehaviour, IDamageable
         Vector3 dir = (_startPosition - transform.position).normalized;
         //_characterController.Move(dir * MoveSpeed * Time.deltaTime);
         _agent.SetDestination(_startPosition);
-        if(Vector3.Distance( transform.position, _startPosition) <= MinDistance)
+        if (Vector3.Distance(transform.position, _startPosition) <= MinDistance)
         {
             Debug.Log("상태전환: Patrol -> Idle");
-            transform.position =_startPosition;
+            transform.position = _startPosition;
             CurrentState = EnemyState.Idle;
             SetAnimation(CurrentState);
         }
@@ -343,13 +329,12 @@ public class Enemy : MonoBehaviour, IDamageable
         _agent.ResetPath();
         // 행동: 플레이어를 공격한다.
         _attackTimer -= Time.deltaTime;
-        if (_attackTimer <= 0 )
+        if (_attackTimer <= 0)
         {
+            SetAnimation(CurrentState);
             _attackTimer = AttackCooltime;
-            Debug.Log("플레이어 공격!");
-            EnemyAttackEvent();
-
-            //StartCoroutine(AttackDelay());
+            Debug.Log("상태전화: Attck -> Trace");
+            CurrentState = EnemyState.Trace;
         }
     }
 
@@ -358,25 +343,13 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (_player.TryGetComponent<IDamageable>(out IDamageable idamageable))
         {
+            Debug.Log("플레이어 공격!");
             Damage damage = new Damage();
             damage.Value = 10;
             damage.From = this.gameObject;
             idamageable.TakeDamage(damage);
         }
     }
-
-    private IEnumerator AttackDelay()
-    {
-        SetAnimation(CurrentState);
-        yield return new WaitForSeconds(_attackDelay);
-        if (_player.TryGetComponent<IDamageable>(out IDamageable idamageable))
-        {
-            Damage damage = new Damage();
-            damage.Value = 10;
-            idamageable.TakeDamage(damage);
-        }
-    }
-
     private void Knockback()
     {
         // 행동: 공격을 당하면 뒤로 밀려난다.
@@ -390,31 +363,9 @@ public class Enemy : MonoBehaviour, IDamageable
             SetAnimation(CurrentState);
         }
     }
-
-    private IEnumerator Damaged_Coroutine()
+    private IEnumerator Die_Coroutine()
     {
-        // 행동: 일정 시간동안 멈춰있다가 -> Trace
-        //_damagedTimer += Time.deltaTime;
-        //if (_damagedTimer >= DamagedTime)
-        //{
-        //    _damagedTimer = 0f;
-        //    Debug.Log("상태전환: Damaged -> Trace");
-        //    CurrentState = EnemyState.Trace;
-        //}
 
-        //코루틴 방식으로 변경
-        _agent.isStopped = true;
-        _agent.ResetPath();
-        yield return new WaitForSeconds(DamagedTime);
-        Debug.Log("상태전환: Damaged -> Trace");
-        CurrentState = EnemyState.Trace;
-        SetAnimation(CurrentState);
-    }
-
-    private IEnumerator Die_Coroutin()
-    {
-        _agent.isStopped = true;
-        _agent.ResetPath();
         //CharacterController controller = GetComponent<CharacterController>();
         //controller.enabled = false;
         yield return new WaitForSeconds(_dethTime);

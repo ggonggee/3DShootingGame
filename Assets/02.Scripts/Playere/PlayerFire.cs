@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 using static Unity.Burst.Intrinsics.X86.Avx;
 
 public enum WeaponMode
@@ -81,7 +82,7 @@ public class PlayerFire : MonoBehaviour
         {
             CurrentWeaponMode = WeaponMode.Gun;
             Debug.Log("넘버키 1이 눌러 졌다");
-            for(int i = 0; i < Weapon.Length; i++)
+            for (int i = 0; i < Weapon.Length; i++)
             {
                 Weapon[i].SetActive((int)CurrentWeaponMode == i);
             }
@@ -100,18 +101,16 @@ public class PlayerFire : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             _holdStartTime = Time.time;
-
         }
 
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonUp(1))
         {
-
-            ThrowPower = MinThrowPower* Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
+            ThrowPower = MinThrowPower * Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
             ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
 
-            if(BombCount > 0)
+            if (BombCount > 0)
             {
                 GameObject bomb = PollingManager.Instance.GetBombPrefab();
                 bomb.transform.position = FirePosition.transform.position;
@@ -120,16 +119,17 @@ public class PlayerFire : MonoBehaviour
                 Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
                 // 반드시 초기화!
                 bombRigidbody.angularVelocity = Vector3.zero;
-                bombRigidbody.linearVelocity = Vector3.zero; 
+                bombRigidbody.linearVelocity = Vector3.zero;
                 bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
                 BombCount -= 1;
                 UIManager.Instance.SetBomb(BombCount, MaxBombCount);
-                }            // 3. 발사 위치에 수류탄 생성하기
+            }            // 3. 발사 위치에 수류탄 생성하기
         }
 
         if (!isReLoading)
         {
-            if(Input.GetKeyDown(KeyCode.R)){
+            if (Input.GetKeyDown(KeyCode.R))
+            {
                 isReLoading = true;
                 ReloadTimer = 0;
             }
@@ -137,15 +137,15 @@ public class PlayerFire : MonoBehaviour
 
         if (isReLoading)
         {
-             ReloadTimer+= Time.deltaTime;
-            if(ReloadTimer> ReloadInterval)
+            ReloadTimer += Time.deltaTime;
+            if (ReloadTimer > ReloadInterval)
             {
                 isReLoading = false;
                 ReloadTimer = 0;
                 BulletCount = MaxBulletCount;
                 UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
             }
-            UIManager.Instance.SetReload(ReloadTimer,ReloadInterval, isReLoading);
+            UIManager.Instance.SetReload(ReloadTimer, ReloadInterval, isReLoading);
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -186,12 +186,12 @@ public class PlayerFire : MonoBehaviour
         // 1. 왼쪽 버튼 입력 받기
         if (Input.GetMouseButton(0))
         {
-            if(CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
+            if (CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
             {
                 _animator.SetTrigger("Shot");
                 ShotTimer -= Time.deltaTime;
-            
-                if(ShotTimer < 0)
+
+                if (ShotTimer < 0)
                 {
                     BulletCount--;
                     UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
@@ -201,36 +201,29 @@ public class PlayerFire : MonoBehaviour
 
                     // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
                     Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
-                
-                // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
-                RaycastHit hitInfo = new RaycastHit();
 
-                // 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
-                bool isHit = Physics.Raycast(ray, out hitInfo);
-                if (isHit) //데이터가 있다면 (부딛혔다면
-                {
-                    // 피격 이펙트 생성(표시)
-                    BulletEffect.transform.position = hitInfo.point;
-                    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
-                    BulletEffect.Play();
+                    // 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
+                    RaycastHit hitInfo = new RaycastHit();
 
-
-                    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
-                    // 총알을 맞은 친구가 IDamageable 구현체라면...
-                    if(hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                    // 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
+                    bool isHit = Physics.Raycast(ray, out hitInfo);
+                    if (isHit) //데이터가 있다면 (부딛혔다면
                     {
-                        //Enemy enemy = hitInfo.collider.GetComponent<Enemy>();
+                        // 피격 이펙트 생성(표시)
+                        BulletEffect.transform.position = hitInfo.point;
+                        BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
+                        BulletEffect.Play();
 
-                        Damage damage = new Damage();
-                        damage.Value = 10;
-                       damage.From = this.gameObject;
-
-                            //enemy.TakeDamage(damage);
+                        //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                        // 총알을 맞은 친구가 IDamageable 구현체라면...
+                        if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                        {                            
+                            Damage damage = new Damage();
+                            damage.Value = 10;
+                            damage.From = this.gameObject;                            
                             damageable.TakeDamage(damage);
-                    }
-
+                        }
                         // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
-
                     }
                     // Ray: 레이저( 시작위치, 방향)
                     // RayCast : 레이저를 발사

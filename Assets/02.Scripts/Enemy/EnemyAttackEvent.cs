@@ -2,7 +2,7 @@
 
 public class EnemyAttackEvent : MonoBehaviour
 {
-    public Enemy MyEnemy;
+    private Enemy MyEnemy;
 
     private void Start()
     {
@@ -11,7 +11,14 @@ public class EnemyAttackEvent : MonoBehaviour
 
     public void AttackEvent()
     {
-        //EnemyAttackEvent();
-        Debug.Log("플레이어 공격!");
+        if (MyEnemy != null)
+        {
+            MyEnemy.EnemyAttackEvent();
+            Debug.Log("플레이어 공격!");
+        }
+        else
+        {
+            Debug.LogWarning("Enemy  컴포넌트를 찾을수 없습니다.");
+        }
     }
 }
