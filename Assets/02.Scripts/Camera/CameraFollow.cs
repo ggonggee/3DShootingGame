@@ -1,6 +1,6 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-enum CameraType
+public enum CameraMode
 {
     FpsMode,
     TpsMode,
@@ -12,10 +12,27 @@ public class CameraFollow : MonoBehaviour
     public Transform FpsTarget;
     public Transform TpsTarget;
     public Transform QuarterTarget;
+
+    public CameraMode CurrentCameraMode;
+    
+
     private void Update()
     {
-        // º¸°£(inter 
-        transform.position = FpsTarget.position;
+        if(CurrentCameraMode == CameraMode.FpsMode)
+        {
+        // ë³´ê°„(inter 
+            transform.position = FpsTarget.position;
+        }
+        if (CurrentCameraMode == CameraMode.TpsMode)
+        {
+            // ë³´ê°„(inter 
+            transform.position = TpsTarget.position;
+        }
+        if (CurrentCameraMode == CameraMode.QuaterMode)
+        {
+            // ë³´ê°„(inter 
+            transform.position = QuarterTarget.position;
+        }
 
     }
 

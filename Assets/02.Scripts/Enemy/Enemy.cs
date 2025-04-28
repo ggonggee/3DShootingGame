@@ -106,6 +106,13 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        //사망했거나 공격받고 있는 중이라면..
+        if (CurrentState == EnemyState.Die)
+        //if (CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
+        {
+            return;
+        }
+
         //if(Type  == EnemyType.Tracer)
         //{
         //    Vector3 dir = _player.transform.position - transform.position;
@@ -172,12 +179,11 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void TakeDamage(Damage damage)
     {
-        //사망했거나 공격받고 있는 중이라면..
-        if(CurrentState == EnemyState.Die)
-            //if (CurrentState == EnemyState.Damaged || CurrentState == EnemyState.Die)
-            {
-                return;
-            }
+        if (CurrentState == EnemyState.Die)
+        {
+            return;
+        }
+
         CurrentHealth -= damage.Value;
 
         HPSlider.value =  CurrentHealth;
@@ -220,7 +226,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             Debug.Log("상태전환: Idle -> Trace");
             CurrentState = EnemyState.Trace;
-            SetAnimation(CurrentState);
+            //SetAnimation(CurrentState);
         }
 
         // 전이: 시간이 지나면 패트롤을 한다.
@@ -395,6 +401,8 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         _agent.isStopped = true;
         _agent.ResetPath();
+        //CharacterController controller = GetComponent<CharacterController>();
+        //controller.enabled = false;
         yield return new WaitForSeconds(_dethTime);
         transform.gameObject.SetActive(false);
     }

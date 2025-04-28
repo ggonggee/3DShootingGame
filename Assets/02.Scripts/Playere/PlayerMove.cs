@@ -35,11 +35,14 @@ public class PlayerMove : MonoBehaviour
     private float _yVelocity = 0f;
 
     private CharacterController _controller;
+    public Animator _anmator;
+
 
     public bool isDeath;
 
     private void Awake()
     {
+        _anmator = GetComponentInChildren<Animator>();
         _controller = GetComponent<CharacterController>();
         UIManager.Instance.SetStamina(Stamina, MaxStamina);
     }
@@ -60,6 +63,9 @@ public class PlayerMove : MonoBehaviour
         float v = Input.GetAxis("Vertical");
 
         Vector3 dir = new Vector3(h, 0, v).normalized;
+        //_anmator.SetLayerWeight(2, Player)
+        _anmator.SetFloat("MoveAmount", dir.magnitude);
+
         dir = Camera.main.transform.TransformDirection(dir);
 
         bool isSprinting = Input.GetKey(KeyCode.LeftShift) && Stamina > 0f && dir.magnitude > 0.1f;
