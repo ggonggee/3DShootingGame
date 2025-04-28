@@ -347,7 +347,21 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             _attackTimer = AttackCooltime;
             Debug.Log("플레이어 공격!");
-            StartCoroutine(AttackDelay());
+            EnemyAttackEvent();
+
+            //StartCoroutine(AttackDelay());
+        }
+    }
+
+    //EnemyAttackEvent();
+    public void EnemyAttackEvent()
+    {
+        if (_player.TryGetComponent<IDamageable>(out IDamageable idamageable))
+        {
+            Damage damage = new Damage();
+            damage.Value = 10;
+            damage.From = this.gameObject;
+            idamageable.TakeDamage(damage);
         }
     }
 

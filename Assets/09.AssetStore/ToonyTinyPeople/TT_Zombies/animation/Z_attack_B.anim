@@ -33772,9 +33772,9 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.4180287
-    functionName: AttackPlayer
+    functionName: AttackEvent
     data: 
-    objectReferenceParameter: {fileID: 2172116645741430092, guid: 343f601ba04cfd944a0e45bac9671b45, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

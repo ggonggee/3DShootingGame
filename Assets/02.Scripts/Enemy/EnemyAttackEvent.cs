@@ -3,6 +3,12 @@
 public class EnemyAttackEvent : MonoBehaviour
 {
     public Enemy MyEnemy;
+
+    private void Start()
+    {
+        MyEnemy = GetComponentInParent<Enemy>();
+    }
+
     public void AttackEvent()
     {
         //EnemyAttackEvent();
