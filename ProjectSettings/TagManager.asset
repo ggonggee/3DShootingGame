@@ -7,6 +7,11 @@ TagManager:
   - FxTemporaire
   - Enemy
   - Barrel
+  - CinemachineTarget
+  - Skin
+  - VehicleArea
+  - Bullet
+  - DeadZone
   layers:
   - Default
   - TransparentFX
@@ -18,7 +23,7 @@ TagManager:
   - Enemy
   - Minimap
   - Barrel
-  - 
+  - PlayerHead
   - 
   - 
   - 
