@@ -45,12 +45,16 @@ public class PlayerFire : MonoBehaviour
     private float _holdStartTime; //마우스를 누른 시간(Time.time)을 저장
     private const float ThrowPowerMultiplier = 1.5f;
 
+    public GameObject UI_CrosseHair;
+    public GameObject UI_SniperZoom;
+    private bool _zoomMode = false;
+    public float ZoomInSize = 15f;
+    public float ZoomOutSize = 60f;
+
     // 목표: 마우스 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다. 
 
     public ParticleSystem BulletEffect;
     public Animator _animator;
-
-
 
     // 과제 1. 폭탄 개수 3개로 제한하기
     // - 하단에('현재 개수'/'최대 개수') 형태로 UI Text표시(TMP, 한글지원되는 폰트)
@@ -100,30 +104,42 @@ public class PlayerFire : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            _holdStartTime = Time.time;
+
+            //_holdStartTime = Time.time;
+
+            UI_CrosseHair.SetActive(false);
+            UI_SniperZoom.SetActive(true);
+            Camera.main.fieldOfView = ZoomOutSize;
+
         }
 
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonUp(1))
         {
-            ThrowPower = MinThrowPower * Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
-            ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
+            //ThrowPower = MinThrowPower * Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
+            //ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
 
-            if (BombCount > 0)
-            {
-                GameObject bomb = PollingManager.Instance.GetBombPrefab();
-                bomb.transform.position = FirePosition.transform.position;
+            //if (BombCount > 0)
+            //{
+            //    GameObject bomb = PollingManager.Instance.GetBombPrefab();
+            //    bomb.transform.position = FirePosition.transform.position;
 
-                // 4. 생성된 슈류탄을 카메라 방향으로 물리적인 힘 가하기
-                Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
-                // 반드시 초기화!
-                bombRigidbody.angularVelocity = Vector3.zero;
-                bombRigidbody.linearVelocity = Vector3.zero;
-                bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
-                BombCount -= 1;
-                UIManager.Instance.SetBomb(BombCount, MaxBombCount);
-            }            // 3. 발사 위치에 수류탄 생성하기
+            //     4. 생성된 슈류탄을 카메라 방향으로 물리적인 힘 가하기
+            //    Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
+            //     반드시 초기화!
+            //    bombRigidbody.angularVelocity = Vector3.zero;
+            //    bombRigidbody.linearVelocity = Vector3.zero;
+            //    bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
+            //    BombCount -= 1;
+            //    UIManager.Instance.SetBomb(BombCount, MaxBombCount);
+            //}            // 3. 발사 위치에 수류탄 생성하기                
+
+
+            UI_CrosseHair.SetActive(true);
+            UI_SniperZoom.SetActive(false);
+            Camera.main.fieldOfView = ZoomInSize;
+
         }
 
         if (!isReLoading)
@@ -217,10 +233,10 @@ public class PlayerFire : MonoBehaviour
                         //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
                         // 총알을 맞은 친구가 IDamageable 구현체라면...
                         if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
-                        {                            
+                        {
                             Damage damage = new Damage();
                             damage.Value = 10;
-                            damage.From = this.gameObject;                            
+                            damage.From = this.gameObject;
                             damageable.TakeDamage(damage);
                         }
                         // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)

@@ -181,6 +181,7 @@ public class Enemy : MonoBehaviour, IDamageable
             Debug.Log($"상태전환: {CurrentState} -> Die");
             _agent.isStopped = true;
             _agent.ResetPath();
+            _characterController.enabled = false;
             CurrentState = EnemyState.Die;
             SetAnimation(EnemyState.Die);
             StartCoroutine(Die_Coroutine());
