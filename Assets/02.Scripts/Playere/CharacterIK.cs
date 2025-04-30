@@ -1,15 +1,22 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class CharacterIK : MonoBehaviour
 {
     public Animator animator;
     public Transform leftHandTarget;
+    public PlayerFire PlayerFire;
 
     void OnAnimatorIK(int layerIndex)
     {
-        if (leftHandTarget == null || animator == null) return;
+        WeaponMode weaponMode = PlayerFire.GetWeaponMode();
+        if (weaponMode == WeaponMode.Nife)
+        {
+            return;
+        }
 
-        // ¿Ş¼Õ À§Ä¡/È¸Àü Å¸°Ù ÁöÁ¤
+        if (leftHandTarget == null || animator == null ) return;
+
+        // ì™¼ì† ìœ„ì¹˜/íšŒì „ íƒ€ê²Ÿ ì§€ì •
         animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
         animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
 

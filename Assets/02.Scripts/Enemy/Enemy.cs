@@ -168,6 +168,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void TakeDamage(Damage damage)
     {
+        Debug.Log("데미지를 받았다!");
         if (CurrentState == EnemyState.Die)
         {
             return;
@@ -190,8 +191,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
         Debug.Log($"상태전환: {CurrentState} -> Damaged");
         //_damagedTimer = 0f;
-        CurrentState = EnemyState.Damaged;
-        SetAnimation(CurrentState);
+        //CurrentState = EnemyState.Damaged;
+        SetAnimation(EnemyState.Damaged);
         //StartCoroutine(Damaged_Coroutine());
     }
 
@@ -224,6 +225,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             _patrolTimer = 0;
             Debug.Log("상태전환: Idle -> Patrol");
+            
             _startPosition = PatrolPositions[_PatrolPositionIndex].position;
             _PatrolPositionIndex++;
             if (_PatrolPositionIndex >= PatrolPositions.Length)

@@ -27,13 +27,12 @@ public class CameraRotate : MonoBehaviour
         //ector3 dir = new Vector3(-mouseY, mouseX, 0);
         _rotationX += mouseX * RotationSpeed * Time.deltaTime;
         _rotationY += -mouseY* RotationSpeed * Time.deltaTime;
-        _rotationY = Mathf.Clamp(_rotationY, -90f, 90f);
+        _rotationY = Mathf.Clamp(_rotationY, -80f, 30f);
 
         // 3. 카메라를 그 방향으로 회전한다.
         // 새로운 위치 = 현제 위치 + 속도(속력 + 시간)
         // 새로운 각도 = 현재 각고 + 회전 속도 * 시간
         transform.eulerAngles = new Vector3(_rotationY, _rotationX, 0);
-
 
         //회전의 상하 제한이 필요하다! (-90~ 90)
 
