@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+
+using UnityEngine;
 
 using static Unity.Burst.Intrinsics.X86.Avx;
 
@@ -75,6 +77,7 @@ public class PlayerFire : MonoBehaviour
         UIManager.Instance.SetBomb(BombCount, MaxBombCount);
         UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
         Cursor.lockState = CursorLockMode.Locked;
+        SetWeapon();
     }
 
 
@@ -82,15 +85,30 @@ public class PlayerFire : MonoBehaviour
     {
         if ( weaponMode == WeaponMode.Gun)
         {
+            _animator.SetBool("AttackMode", true);
             _animator.SetBool("NifeMode", false);
+            _animator.SetBool("ThrowMode", false);
         }
         if( weaponMode == WeaponMode.Nife)
         {
+            _animator.SetBool("AttackMode", false);
             _animator.SetBool("NifeMode", true);
+            _animator.SetBool("ThrowMode", false);
         }
         if (weaponMode == WeaponMode.Grenade)
         {
+            _animator.SetBool("AttackMode", false);
             _animator.SetBool("NifeMode", false);
+            _animator.SetBool("ThrowMode", true);
+        }
+        SetWeapon();
+    }
+
+    private void SetWeapon()
+    {
+        for (int i = 0; i < Weapon.Length; i++)
+        {
+            Weapon[i].SetActive((int)CurrentWeaponMode == i);
         }
     }
 
@@ -111,10 +129,6 @@ public class PlayerFire : MonoBehaviour
             CurrentWeaponMode = WeaponMode.Gun;
             SetWeaponModeAnimation(CurrentWeaponMode);
             Debug.Log("넘버키 1이 눌러 졌다");
-            for (int i = 0; i < Weapon.Length; i++)
-            {
-                Weapon[i].SetActive((int)CurrentWeaponMode == i);
-            }
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -122,15 +136,16 @@ public class PlayerFire : MonoBehaviour
             CurrentWeaponMode = WeaponMode.Nife;
             SetWeaponModeAnimation(CurrentWeaponMode);
             Debug.Log("넘버키 2이 눌러 졌다");
-            for (int i = 0; i < Weapon.Length; i++)
-            {
-                Weapon[i].SetActive((int)CurrentWeaponMode == i);
-            }
         }
-
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            CurrentWeaponMode = WeaponMode.Grenade;
+            SetWeaponModeAnimation(CurrentWeaponMode);
+            Debug.Log("넘버키 3이 눌러 졌다");           
+        }
+      
         if (Input.GetMouseButtonDown(1))
         {
-
             //_holdStartTime = Time.time;
 
             UI_CrosseHair.SetActive(false);
@@ -142,26 +157,7 @@ public class PlayerFire : MonoBehaviour
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonUp(1))
-        {
-            //ThrowPower = MinThrowPower * Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
-            //ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
-
-            //if (BombCount > 0)
-            //{
-            //    GameObject bomb = PollingManager.Instance.GetBombPrefab();
-            //    bomb.transform.position = FirePosition.transform.position;
-
-            //     4. 생성된 슈류탄을 카메라 방향으로 물리적인 힘 가하기
-            //    Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
-            //     반드시 초기화!
-            //    bombRigidbody.angularVelocity = Vector3.zero;
-            //    bombRigidbody.linearVelocity = Vector3.zero;
-            //    bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
-            //    BombCount -= 1;
-            //    UIManager.Instance.SetBomb(BombCount, MaxBombCount);
-            //}            // 3. 발사 위치에 수류탄 생성하기                
-
-
+        {            
             UI_CrosseHair.SetActive(true);
             UI_SniperZoom.SetActive(false);
             Camera.main.fieldOfView = ZoomInSize;
@@ -191,35 +187,38 @@ public class PlayerFire : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            if (CurrentWeaponMode == WeaponMode.Nife)
+
+        }
+
+        if (Input.GetKeyDown(0))
+        {
+
+        }
+
+        if (Input.GetKeyUp(0))
+        {
+            if (CurrentWeaponMode == WeaponMode.Grenade)
             {
-                Animator ani = Weapon[(int)WeaponMode.Nife].GetComponent<Animator>();
-                ani.SetTrigger("Attack");
-                Collider[] cols = Physics.OverlapSphere(transform.position, _knifeDestance, LayerMask.GetMask("Enemy"));
+                _animator.SetTrigger("Throw");
+                ThrowPower = MinThrowPower * Mathf.Clamp(Time.time - _holdStartTime, 0, MaxHoldTime) * ThrowPowerMultiplier;
+                ThrowPower = Mathf.Clamp(ThrowPower, MinThrowPower, MaxThrowPower);
 
-                for (int i = 0; i < cols.Length; i++)
+                if (BombCount > 0)
                 {
-                    Vector3 target = cols[i].transform.position - transform.position;
-                    target.y = 0; // 높이 차이는 무시할 경우
+                    GameObject bomb = PollingManager.Instance.GetBombPrefab();
+                    bomb.transform.position = FirePosition.transform.position;
 
-                    if (cols[i].CompareTag("Enemy"))
-                    {
-                        float angle = Vector3.Angle(transform.forward, target);
-                        if (angle > _knifeAngle * 0.5f)
-                        {
-                            Debug.Log("칼이 안닿는다");
-                            return;
-                        }
-
-                        if (cols[i].TryGetComponent<IDamageable>(out IDamageable damageAble))
-                        {
-                            Debug.Log("칼 맞았다!");
-                            Damage damage = new Damage();
-                            damage.Value = 100;
-                            damageAble.TakeDamage(damage);
-                        }
-                    }
+                    //4.생성된 슈류탄을 카메라 방향으로 물리적인 힘 가하기
+                    Rigidbody bombRigidbody = bomb.GetComponent<Rigidbody>();
+                    //반드시 초기화!
+                    bombRigidbody.angularVelocity = Vector3.zero;
+                    bombRigidbody.linearVelocity = Vector3.zero;
+                    bombRigidbody.AddForce(Camera.main.transform.forward * ThrowPower, ForceMode.Impulse);
+                    BombCount -= 1;
+                    UIManager.Instance.SetBomb(BombCount, MaxBombCount);
                 }
+                // 3. 발사 위치에 수류탄 생성하기             
+                return;
             }
         }
 
@@ -230,7 +229,40 @@ public class PlayerFire : MonoBehaviour
             if(CurrentWeaponMode == WeaponMode.Nife)
             {
                 _animator.SetTrigger("NifeAttack");
+                if (CurrentWeaponMode == WeaponMode.Nife)
+                {
+                    Animator ani = Weapon[(int)WeaponMode.Nife].GetComponent<Animator>();
+                    //ani.SetTrigger("Attack");
+                    Collider[] cols = Physics.OverlapSphere(transform.position, _knifeDestance, LayerMask.GetMask("Enemy"));
+
+                    for (int i = 0; i < cols.Length; i++)
+                    {
+                        Vector3 target = cols[i].transform.position - transform.position;
+                        target.y = 0; // 높이 차이는 무시할 경우
+
+                        if (cols[i].CompareTag("Enemy"))
+                        {
+                            float angle = Vector3.Angle(transform.forward, target);
+                            if (angle > _knifeAngle * 0.5f)
+                            {
+                                Debug.Log("칼이 안닿는다");
+                                return;
+                            }
+
+                            if (cols[i].TryGetComponent<IDamageable>(out IDamageable damageAble))
+                            {
+                                Debug.Log("칼 맞았다!");
+                                Damage damage = new Damage();
+                                damage.Value = 100;
+                                damageAble.TakeDamage(damage);
+                            }
+                        }
+                    }
+                }
+                return;
             }
+
+           
 
             if (CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
             {
