@@ -35,14 +35,14 @@ public class PlayerMove : MonoBehaviour
     private float _yVelocity = 0f;
 
     private CharacterController _controller;
-    public Animator _anmator;
+    public Animator _animator;
 
 
     public bool isDeath;
 
     private void Awake()
     {
-        _anmator = GetComponentInChildren<Animator>();
+        _animator = GetComponentInChildren<Animator>();
         _controller = GetComponent<CharacterController>();
         UIManager.Instance.SetStamina(Stamina, MaxStamina);
     }
@@ -64,7 +64,7 @@ public class PlayerMove : MonoBehaviour
 
         Vector3 dir = new Vector3(h, 0, v).normalized;
         //_anmator.SetLayerWeight(2, Player)
-        _anmator.SetFloat("MoveAmount", dir.magnitude);
+        _animator.SetFloat("MoveAmount", dir.magnitude);
 
         dir = Camera.main.transform.TransformDirection(dir);
 
@@ -92,6 +92,8 @@ public class PlayerMove : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && _jumpCount < MaxJumpCount)
         {
+            //_animator.SetTrigger("Jump");
+            //_animator.SetBool("IsGround", false);
             _yVelocity = JumpPower;
             _jumpCount++;
         }
@@ -117,10 +119,15 @@ public class PlayerMove : MonoBehaviour
             dir.y = _yVelocity;
         }
 
+        if (!isGrounded)
+        {
+            _animator.SetBool("IsGround", false);
+        }
+
         if (isGrounded)
         {
             _jumpCount = 0;
-
+            _animator.SetBool("IsGround", true);
             if (!isSprinting)
             {
                 Stamina += RecoverPerSecond * Time.deltaTime;
@@ -130,7 +137,6 @@ public class PlayerMove : MonoBehaviour
                 }
             }
         }
-
         _controller.Move(dir * moveSpeed * Time.deltaTime);
     }
 }

@@ -77,20 +77,25 @@ public class PlayerFire : MonoBehaviour
         UIManager.Instance.SetBomb(BombCount, MaxBombCount);
         UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
         Cursor.lockState = CursorLockMode.Locked;
-        SetWeapon();
+        SetWeaponModeAnimation(CurrentWeaponMode);
+        
     }
 
 
     public void SetWeaponModeAnimation(WeaponMode weaponMode)
     {
-        if ( weaponMode == WeaponMode.Gun)
+        if (weaponMode == WeaponMode.Gun)
         {
             _animator.SetBool("AttackMode", true);
             _animator.SetBool("NifeMode", false);
             _animator.SetBool("ThrowMode", false);
         }
-        if( weaponMode == WeaponMode.Nife)
+        if (weaponMode == WeaponMode.Nife)
         {
+            //if (Input.GetMouseButtonDown(0) && !animator.GetCurrentAnimatorStateInfo(0).IsName("KnifeAttack"))
+            //{
+            //    animator.SetTrigger("KnifeSwing");
+            //}
             _animator.SetBool("AttackMode", false);
             _animator.SetBool("NifeMode", true);
             _animator.SetBool("ThrowMode", false);
@@ -101,6 +106,7 @@ public class PlayerFire : MonoBehaviour
             _animator.SetBool("NifeMode", false);
             _animator.SetBool("ThrowMode", true);
         }
+        UIManager.Instance.SetCurrentWeapon(CurrentWeaponMode);
         SetWeapon();
     }
 
@@ -117,8 +123,56 @@ public class PlayerFire : MonoBehaviour
         return CurrentWeaponMode;
     }
 
+    public void KnifeAttack()
+    {
+        //Animator ani = Weapon[(int)WeaponMode.Nife].GetComponent<Animator>();
+        //ani.SetTrigger("Attack");
+        Collider[] cols = Physics.OverlapSphere(transform.position, _knifeDestance, LayerMask.GetMask("Enemy"));
+
+        for (int i = 0; i < cols.Length; i++)
+        {
+            Vector3 target = cols[i].transform.position - transform.position;
+            target.y = 0; // 높이 차이는 무시할 경우
+
+            if (cols[i].CompareTag("Enemy"))
+            {
+                float angle = Vector3.Angle(transform.forward, target);
+                if (angle > _knifeAngle * 0.5f)
+                {
+                    Debug.Log("칼이 안닿는다");
+                    return;
+                }
+
+                if (cols[i].TryGetComponent<IDamageable>(out IDamageable damageAble))
+                {
+                    Debug.Log("칼 맞았다!");
+                    Damage damage = new Damage();
+                    damage.Value = 100;
+                    damageAble.TakeDamage(damage);
+                }
+            }
+        }
+    }
+
     private void Update()
     {
+
+        float scroll = Input.GetAxisRaw("Mouse ScrollWheel");
+        if (scroll > 0 )
+        {
+            Debug.Log("스크롤 플러스");
+           int next = ((int)CurrentWeaponMode +1) % (int)WeaponMode.Count;
+            CurrentWeaponMode = (WeaponMode)next;
+            SetWeaponModeAnimation(CurrentWeaponMode);
+        }
+        else if( scroll < 0)
+        {
+            Debug.Log("스크롤 마이너스");
+            int prev = ((int)CurrentWeaponMode - 1) % (int)WeaponMode.Count;
+            CurrentWeaponMode = (WeaponMode)prev;
+            SetWeaponModeAnimation(CurrentWeaponMode);
+        }
+
         if (GameManager.Instance.CurrentGameMove != GameMode.Run)
         {
             return;
@@ -141,9 +195,9 @@ public class PlayerFire : MonoBehaviour
         {
             CurrentWeaponMode = WeaponMode.Grenade;
             SetWeaponModeAnimation(CurrentWeaponMode);
-            Debug.Log("넘버키 3이 눌러 졌다");           
+            Debug.Log("넘버키 3이 눌러 졌다");
         }
-      
+
         if (Input.GetMouseButtonDown(1))
         {
             //_holdStartTime = Time.time;
@@ -157,7 +211,7 @@ public class PlayerFire : MonoBehaviour
         // 2. 오른쪽 버튼 입력 받기
         // - 0: 왼쪽, 1: 오른쪽, 2: 휠
         if (Input.GetMouseButtonUp(1))
-        {            
+        {
             UI_CrosseHair.SetActive(true);
             UI_SniperZoom.SetActive(false);
             Camera.main.fieldOfView = ZoomInSize;
@@ -192,10 +246,12 @@ public class PlayerFire : MonoBehaviour
 
         if (Input.GetKeyDown(0))
         {
-
+            if (CurrentWeaponMode == WeaponMode.Grenade)
+            {
+                _holdStartTime = Time.deltaTime;
+            }
         }
-
-        if (Input.GetKeyUp(0))
+        if (Input.GetKeyDown(0))
         {
             if (CurrentWeaponMode == WeaponMode.Grenade)
             {
@@ -228,110 +284,79 @@ public class PlayerFire : MonoBehaviour
         {
             if(CurrentWeaponMode == WeaponMode.Nife)
             {
-                _animator.SetTrigger("NifeAttack");
-                if (CurrentWeaponMode == WeaponMode.Nife)
+                if (Input.GetMouseButtonDown(0) && !_animator.GetCurrentAnimatorStateInfo(0).IsName("KnifeAttack"))
                 {
-                    Animator ani = Weapon[(int)WeaponMode.Nife].GetComponent<Animator>();
-                    //ani.SetTrigger("Attack");
-                    Collider[] cols = Physics.OverlapSphere(transform.position, _knifeDestance, LayerMask.GetMask("Enemy"));
-
-                    for (int i = 0; i < cols.Length; i++)
-                    {
-                        Vector3 target = cols[i].transform.position - transform.position;
-                        target.y = 0; // 높이 차이는 무시할 경우
-
-                        if (cols[i].CompareTag("Enemy"))
-                        {
-                            float angle = Vector3.Angle(transform.forward, target);
-                            if (angle > _knifeAngle * 0.5f)
-                            {
-                                Debug.Log("칼이 안닿는다");
-                                return;
-                            }
-
-                            if (cols[i].TryGetComponent<IDamageable>(out IDamageable damageAble))
-                            {
-                                Debug.Log("칼 맞았다!");
-                                Damage damage = new Damage();
-                                damage.Value = 100;
-                                damageAble.TakeDamage(damage);
-                            }
-                        }
-                    }
+                    _animator.SetTrigger("KnifeAttack");
                 }
-                return;
             }
 
-           
+        if (CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
+        {
+            //_animator.SetTrigger("Shot");
+            ShotTimer -= Time.deltaTime;
 
-            if (CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
+            if (ShotTimer < 0)
             {
-                //_animator.SetTrigger("Shot");
-                ShotTimer -= Time.deltaTime;
+                BulletCount--;
+                UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
+                ShotTimer = ShotInterval;
+                isReLoading = false;
+                UIManager.Instance.SetReload(ReloadTimer, ReloadInterval, isReLoading);
 
-                if (ShotTimer < 0)
-                {
-                    BulletCount--;
-                    UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
-                    ShotTimer = ShotInterval;
-                    isReLoading = false;
-                    UIManager.Instance.SetReload(ReloadTimer, ReloadInterval, isReLoading);
+                Vector3 targetPoint = Camera.main.transform.position + Camera.main.transform.forward * 100f;
+                Vector3 shotDir = (targetPoint - Muzzle.position).normalized;
+                Bullet bullet = Instantiate(BulletPrefab);
+                Instantiate(MuzzleFlash, Muzzle.position, Quaternion.identity);
+                bullet.transform.position = Muzzle.position;
+                bullet.transform.forward = shotDir;
+                Damage damage = new Damage();
+                damage.Value = _damage;
+                damage.From = this.gameObject;
+                bullet.Damage = damage;
 
-                    Vector3 targetPoint = Camera.main.transform.position + Camera.main.transform.forward * 100f;
-                    Vector3 shotDir = (targetPoint - Muzzle.position).normalized;
-                    Bullet bullet = Instantiate(BulletPrefab);
-                    Instantiate(MuzzleFlash, Muzzle.position, Quaternion.identity);
-                    bullet.transform.position = Muzzle.position;
-                    bullet.transform.forward = shotDir;
-                    Damage damage = new Damage();
-                    damage.Value = _damage;
-                    damage.From = this.gameObject;
-                    bullet.Damage = damage;
-                    
+                // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
+                //Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
+                //Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
 
-
-                    // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
-                    //Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
-                    //Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-
-                    //if(Physics.Raycast(ray, out RaycastHit hit, 100f))
-                    //{
-                    //    Vector3 shootDir = (hit.point - Muzzle.transform.position).normalized;
-                    //    GameObject bullet = Instantiate(BulletPrefab);
-                    //    bullet.transform.position = Muzzle.transform.position;
-                    //    bullet.transform.forward = shootDir;
-                    //}
+                //if(Physics.Raycast(ray, out RaycastHit hit, 100f))
+                //{
+                //    Vector3 shootDir = (hit.point - Muzzle.transform.position).normalized;
+                //    GameObject bullet = Instantiate(BulletPrefab);
+                //    bullet.transform.position = Muzzle.transform.position;
+                //    bullet.transform.forward = shootDir;
+                //}
 
 
-                    //// 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
-                    //RaycastHit hitInfo = new RaycastHit();
+                //// 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
+                //RaycastHit hitInfo = new RaycastHit();
 
-                    //// 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
-                    //bool isHit = Physics.Raycast(ray, out hitInfo);
-                    //if (isHit) //데이터가 있다면 (부딛혔다면
-                    //{
-                    //    // 피격 이펙트 생성(표시)
-                    //    BulletEffect.transform.position = hitInfo.point;
-                    //    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
-                    //    BulletEffect.Play();
+                //// 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
+                //bool isHit = Physics.Raycast(ray, out hitInfo);
+                //if (isHit) //데이터가 있다면 (부딛혔다면
+                //{
+                //    // 피격 이펙트 생성(표시)
+                //    BulletEffect.transform.position = hitInfo.point;
+                //    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
+                //    BulletEffect.Play();
 
-                    //    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
-                    //    // 총알을 맞은 친구가 IDamageable 구현체라면...
-                    //    if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
-                    //    {
-                    //        Damage damage = new Damage();
-                    //        damage.Value = 10;
-                    //        damage.From = this.gameObject;
-                    //        damageable.TakeDamage(damage);
-                    //    }
-                    //    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
-                    //}
-                    //// Ray: 레이저( 시작위치, 방향)
-                    //// RayCast : 레이저를 발사
-                    //// RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
-                    //Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
-                }
+                //    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                //    // 총알을 맞은 친구가 IDamageable 구현체라면...
+                //    if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                //    {
+                //        Damage damage = new Damage();
+                //        damage.Value = 10;
+                //        damage.From = this.gameObject;
+                //        damageable.TakeDamage(damage);
+                //    }
+                //    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
+                //}
+                //// Ray: 레이저( 시작위치, 방향)
+                //// RayCast : 레이저를 발사
+                //// RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+                //Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
             }
+        }
         }
     }
 }
+

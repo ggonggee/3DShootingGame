@@ -20,6 +20,13 @@ public class UIManager : Singleton<UIManager>
     public TextMeshProUGUI ReadyText;
     public GameObject GameOverPanel;
 
+    public Sprite[] WeaponSprites;
+    public Image CurrentWeaponImage;
+
+    public void SetCurrentWeapon(WeaponMode weaponMode)
+    {
+       CurrentWeaponImage.sprite = WeaponSprites[(int)weaponMode];
+    }
 
     public void SetPlayerHP(float hp)
     {
