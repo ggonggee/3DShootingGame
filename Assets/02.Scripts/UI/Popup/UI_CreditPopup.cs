@@ -2,10 +2,7 @@
 
 using UnityEngine;
 
-public class UI_CreditPopup : MonoBehaviour
+public class UI_CreditPopup : UI_Popup
 {
-    public void Open()
-    {
-        gameObject.SetActive(true);
-    }
+
 }

@@ -17,8 +17,7 @@ public class GameManager : Singleton<GameManager>
 {
     public GameMode CurrentGameMove;
 
-    public UI_OptionPopup UI_OptionPopup;
-    public UI_CreditPopup UI_CreditPopup;
+    //public UI_OptionPopup UI_OptionPopup;
 
     private GameMode _gameState = GameMode.Ready;
     void Start()
@@ -26,15 +25,12 @@ public class GameManager : Singleton<GameManager>
         StartCoroutine(StartGameReady());
     }
 
-
-
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Pause();
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    Pause();
+        //}
 
         if(CurrentGameMove == GameMode.Over)
         {
@@ -42,40 +38,31 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-
-    public void Credit()
-    {
-        UI_CreditPopup.Open();
-    }
-
     public void Restart()
     {
         _gameState = GameMode.Run;
         Time.timeScale = 1;
         Cursor.lockState = CursorLockMode.Locked;
-
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(currentSceneIndex);
-
     }
 
     public void Continue()
     {
         _gameState = GameMode.Run;
         Time.timeScale = 1;
-
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void Pause()
+    public void Pause()
     {
         _gameState = GameMode.Pause;
         Time.timeScale = 0;
-
         Cursor.lockState = CursorLockMode.None;
         // Todo:
         // 옵션 팝업을 활성화 한다.
-        UI_OptionPopup.Open();
+        //UI_OptionPopup.Open();
+        PopupManager.Instance.Open(EPopupType.UI_OptionPopup, closeCallback: Continue);
     }
 
     IEnumerator StartGameReady()

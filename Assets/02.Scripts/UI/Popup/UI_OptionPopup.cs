@@ -1,12 +1,7 @@
 ﻿using UnityEngine;
 
-public class UI_OptionPopup : MonoBehaviour
+public class UI_OptionPopup : UI_Popup
 {
-
-    public void Open()
-    {
-        gameObject.SetActive(true);
-    }
 
     public void OnClickContinueButton()
     {
@@ -22,17 +17,18 @@ public class UI_OptionPopup : MonoBehaviour
 
     public void OnClickeQuitButton()
     {
-//#if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-//#else
+#else
         Application.Quit();
+#endif
 
 
     }
 
     public void OnClickCreditButton()
     {
-        GameManager.Instance.Credit();
+        PopupManager.Instance.Open(EPopupType.UI_CreditPopup);
     }
 
 
