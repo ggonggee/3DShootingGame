@@ -1,29 +1,51 @@
 ﻿using System.Collections;
 
+using UnityEditor;
+
 using UnityEngine;
 
 public enum GameMode
 {
     Ready,
     Run,
+    Pause,
     Over,
 }
 
 public class GameManager : Singleton<GameManager>
 {
     public GameMode CurrentGameMove;
+
+    public UI_OptionPopup UI_OptionPopup;
+
+    private GameMode _gameState = GameMode.Ready;
     void Start()
     {
         StartCoroutine(StartGameReady());
     }
 
 
+
     void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Pause();
+        }
+
         if(CurrentGameMove == GameMode.Over)
         {
             UIManager.Instance.GameOverPanel.SetActive(true);
         }
+    }
+
+    private void Pause()
+    {
+        _gameState = GameMode.Pause;
+        // Todo:
+        // 옵션 팝업을 활성화 한다.
+        UI_OptionPopup.Open();
     }
 
     IEnumerator StartGameReady()

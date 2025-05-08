@@ -23,6 +23,8 @@ public class UIManager : Singleton<UIManager>
     public Sprite[] WeaponSprites;
     public Image CurrentWeaponImage;
 
+    
+
     public void SetCurrentWeapon(WeaponMode weaponMode)
     {
        CurrentWeaponImage.sprite = WeaponSprites[(int)weaponMode];

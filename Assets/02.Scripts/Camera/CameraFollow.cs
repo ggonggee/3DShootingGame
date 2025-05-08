@@ -14,7 +14,7 @@ public class CameraFollow : MonoBehaviour
     public Transform QuarterTarget;
 
     public CameraMode CurrentCameraMode;
-    
+    private Camera cam;
 
     private void Update()
     {
@@ -23,6 +23,7 @@ public class CameraFollow : MonoBehaviour
         // 보간(inter 
             transform.position = FpsTarget.position;
             //transform.rotation = FpsTarget.rotation;
+            
 
         }
         if (CurrentCameraMode == CameraMode.TpsMode)
