@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 using TMPro;
 
@@ -25,6 +27,8 @@ public class UI_InputFields
 
     [Header("회원가입")]
     public UI_InputFields ReqisterInputFields;
+
+    private const string SALT = "10043420";
 
     private void Start()
     {
@@ -101,7 +105,7 @@ public class UI_InputFields
             // 4. PlayerPrefs를 이용해서 아이디와 비밀번호를 저장한다.
             // (선택) -> 비밀번호를 암호화 햇서 저장하세요.
 
-                PlayerPrefs.SetString(id, password);
+                PlayerPrefs.SetString(id, Encryption(password + SALT));
                 LoginInputField.ResultText.text = "아이디가 생성되었습니다.";
             
 
@@ -110,4 +114,22 @@ public class UI_InputFields
             OnClickGoToLoginButton();
         }
     }
+
+    public string Encryption(string text)
+    {
+        // 해시 암호화 알고리즘 인스턴스를 생성한다.
+        SHA256 sha256 = SHA256.Create();
+
+        byte[] bytes = Encoding.UTF8.GetBytes(text);
+        byte[] hash = sha256.ComputeHash(bytes);
+
+        string resultText = string.Empty;
+        foreach(byte b in hash)
+        {
+            resultText += b.ToString("X2");
+        }
+
+        return resultText;
+    }
+
 }
