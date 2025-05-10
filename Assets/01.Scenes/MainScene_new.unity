@@ -13945,6 +13945,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1003112170}
+  - component: {fileID: 1003112171}
   m_Layer: 0
   m_Name: ---ApocalypticWorld_Meshes---
   m_TagString: Untagged
@@ -13969,6 +13970,38 @@ Transform:
   - {fileID: 1881827038}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1003112171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1003112169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 153b4caf1b089b149b4ed8317e31137c, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &1021458590
 GameObject:
   m_ObjectHideFlags: 0
@@ -16672,7 +16705,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1203768634
 Transform:
   m_ObjectHideFlags: 0
@@ -17052,7 +17085,7 @@ MonoBehaviour:
   ReloadInterval: 2
   ReloadTimer: 0
   isReLoading: 0
-  ShotInterval: 0.2
+  ShotInterval: 0.1
   ShotTimer: 0
   BombPrefab: {fileID: 7814986525470086875, guid: 99e7e99c272c2f142a0125211c201096, type: 3}
   BombCount: 0
