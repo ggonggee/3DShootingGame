@@ -74,6 +74,9 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _patrolTimer;
     private int _PatrolPositionIndex = 0;
 
+    [Header("코인")]
+    public GameObject CoinPrefab;
+
     private Animator _enemyAnimator;
     private void Awake()
     {
@@ -185,6 +188,7 @@ public class Enemy : MonoBehaviour, IDamageable
             _characterController.enabled = false;
             CurrentState = EnemyState.Die;
             SetAnimation(EnemyState.Die);
+            DropCoin();
             StartCoroutine(Die_Coroutine());
             return;
         }
@@ -194,6 +198,23 @@ public class Enemy : MonoBehaviour, IDamageable
         //CurrentState = EnemyState.Damaged;
         SetAnimation(EnemyState.Damaged);
         //StartCoroutine(Damaged_Coroutine());
+    }
+
+    private void DropCoin()
+    {
+        Vector3 dropPosition = transform.position;
+
+        // 땅 위치 보정
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 3f, LayerMask.GetMask("Default")))
+        {
+            dropPosition = hit.point + Vector3.up * 0.1f;
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject coin = Instantiate(CoinPrefab);
+            coin.transform.position = dropPosition;
+        }
     }
 
     public void TakeKnockback(Damage damage)
