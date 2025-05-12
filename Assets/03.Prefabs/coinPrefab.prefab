@@ -131,7 +131,7 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
@@ -150,4 +150,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46091748519677a458ea33f38d0c51d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationSpeed: 200
+  player: {fileID: 0}
+  RotationSpeed: 300
+  speed: 3
+  CollectSpeed: 15
+  isCollecting: 0
+  colletRange: 5

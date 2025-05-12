@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 
+using DG.Tweening;
+
 using Unity.Android.Gradle.Manifest;
 using Unity.VisualScripting;
 
@@ -9,6 +11,7 @@ using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+
 
 public enum EnemyType
 {
@@ -182,13 +185,13 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (CurrentHealth <= 0)
         {
+            DropCoin();
             Debug.Log($"상태전환: {CurrentState} -> Die");
             _agent.isStopped = true;
             _agent.ResetPath();
             _characterController.enabled = false;
             CurrentState = EnemyState.Die;
             SetAnimation(EnemyState.Die);
-            DropCoin();
             StartCoroutine(Die_Coroutine());
             return;
         }
@@ -202,18 +205,34 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void DropCoin()
     {
-        Vector3 dropPosition = transform.position;
-
-        // 땅 위치 보정
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 3f, LayerMask.GetMask("Default")))
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f, LayerMask.GetMask("Default")))
         {
-            dropPosition = hit.point + Vector3.up * 0.1f;
+            Vector3 groundPos = hit.point + Vector3.up * 0.2f; // 지면에서 살짝 위로
+
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject coin = Instantiate(CoinPrefab, groundPos, Quaternion.identity);
+
+                // 랜덤 점프 방향 생성
+                Vector3 randomXZ = new Vector3(
+                    UnityEngine.Random.Range(-1f, 1f),
+                    0f,
+                    UnityEngine.Random.Range(-1f, 1f)
+                ).normalized;
+
+                Vector3 jumpTarget = groundPos + randomXZ * UnityEngine.Random.Range(0.5f, 1.5f);
+
+                // Y값은 지면 기준으로 고정 (지면보다 낮아지지 않도록)
+                jumpTarget.y = groundPos.y;
+
+                //coin.transform
+                //    .DOJump(jumpTarget, 2f, 1, 0.8f)
+                //    .SetEase(Ease.OutBounce);
+            }
         }
-
-        for (int i = 0; i < 5; i++)
+        else
         {
-            GameObject coin = Instantiate(CoinPrefab);
-            coin.transform.position = dropPosition;
+            Debug.LogWarning("⚠️ 코인을 드랍할 지면을 찾지 못했습니다.");
         }
     }
 
