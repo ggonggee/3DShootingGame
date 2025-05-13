@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections;
-
+﻿using System.Collections;
 using DG.Tweening;
 
-using Unity.Android.Gradle.Manifest;
 using Unity.VisualScripting;
 
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-
 
 public enum EnemyType
 {
@@ -185,11 +179,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (CurrentHealth <= 0)
         {
-            DropCoin();
+            Vector3 deathPos = transform.position;
+            DropCoinAt(deathPos);
             Debug.Log($"상태전환: {CurrentState} -> Die");
             _agent.isStopped = true;
             _agent.ResetPath();
             _characterController.enabled = false;
+
+
             CurrentState = EnemyState.Die;
             SetAnimation(EnemyState.Die);
             StartCoroutine(Die_Coroutine());
@@ -201,38 +198,47 @@ public class Enemy : MonoBehaviour, IDamageable
         //CurrentState = EnemyState.Damaged;
         SetAnimation(EnemyState.Damaged);
         //StartCoroutine(Damaged_Coroutine());
+
+
     }
 
-    private void DropCoin()
+    private void DropCoinAt(Vector3 pos)
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f, LayerMask.GetMask("Default")))
+        Vector3 groundPos;
+
+        // ✅ NavMesh 위 위치 보정 (가장 안전)
+        if (NavMesh.SamplePosition(pos, out NavMeshHit navHit, 2f, NavMesh.AllAreas))
         {
-            Vector3 groundPos = hit.point + Vector3.up * 0.2f; // 지면에서 살짝 위로
-
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject coin = Instantiate(CoinPrefab, groundPos, Quaternion.identity);
-
-                // 랜덤 점프 방향 생성
-                Vector3 randomXZ = new Vector3(
-                    UnityEngine.Random.Range(-1f, 1f),
-                    0f,
-                    UnityEngine.Random.Range(-1f, 1f)
-                ).normalized;
-
-                Vector3 jumpTarget = groundPos + randomXZ * UnityEngine.Random.Range(0.5f, 1.5f);
-
-                // Y값은 지면 기준으로 고정 (지면보다 낮아지지 않도록)
-                jumpTarget.y = groundPos.y;
-
-                //coin.transform
-                //    .DOJump(jumpTarget, 2f, 1, 0.8f)
-                //    .SetEase(Ease.OutBounce);
-            }
+            groundPos = navHit.position + Vector3.up * 0.2f;
+        }
+        // ⛔ 실패 시 Raycast로 보정
+        else if (Physics.Raycast(pos + Vector3.up * 1.5f, Vector3.down, out RaycastHit hit, 10f))
+        {
+            groundPos = hit.point + Vector3.up * 0.2f;
         }
         else
         {
-            Debug.LogWarning("⚠️ 코인을 드랍할 지면을 찾지 못했습니다.");
+            Debug.LogWarning("⚠️ DropCoinAt(): NavMesh, 지면 모두 찾지 못했습니다.");
+            groundPos = pos + Vector3.up * 0.2f; // fallback 위치
+        }
+
+        // 💰 코인 드랍
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject coin = Instantiate(CoinPrefab, groundPos, Quaternion.identity);
+
+            Vector3 randomXZ = new Vector3(
+                Random.Range(-1f, 1f),
+                0f,
+                Random.Range(-1f, 1f)
+            ).normalized;
+
+            Vector3 jumpTarget = groundPos + randomXZ * Random.Range(0.5f, 1.5f);
+            jumpTarget.y = groundPos.y;
+
+            coin.transform
+                .DOJump(jumpTarget, 2f, 1, 0.8f)
+                .SetEase(Ease.OutBounce);
         }
     }
 

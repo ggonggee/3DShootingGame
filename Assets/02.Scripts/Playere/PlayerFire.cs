@@ -309,52 +309,53 @@ public class PlayerFire : MonoBehaviour
                 Instantiate(MuzzleFlash, Muzzle.position, Quaternion.identity);
                 bullet.transform.position = Muzzle.position;
                 bullet.transform.forward = shotDir;
-                Damage damage = new Damage();
-                damage.Value = _damage;
-                damage.From = this.gameObject;
-                bullet.Damage = damage;
 
-                // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
-                //Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
-                //Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+                    Damage damage = new Damage();
+                    damage.Value = _damage;
+                    damage.From = this.gameObject;
+                    bullet.Damage = damage;
 
-                //if(Physics.Raycast(ray, out RaycastHit hit, 100f))
-                //{
-                //    Vector3 shootDir = (hit.point - Muzzle.transform.position).normalized;
-                //    GameObject bullet = Instantiate(BulletPrefab);
-                //    bullet.transform.position = Muzzle.transform.position;
-                //    bullet.transform.forward = shootDir;
-                //}
+                    // 2. 레이를 생성하고 발사 위치와 진행 방향을 설정
+                    //Ray ray = new Ray(FirePosition.transform.position, Camera.main.transform.forward);
+                    //Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+
+                    //if(Physics.Raycast(ray, out RaycastHit hit, 100f))
+                    //{
+                    //    Vector3 shootDir = (hit.point - Muzzle.transform.position).normalized;
+                    //    GameObject bullet = Instantiate(BulletPrefab);
+                    //    bullet.transform.position = Muzzle.transform.position;
+                    //    bullet.transform.forward = shootDir;
+                    //}
 
 
-                //// 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
-                //RaycastHit hitInfo = new RaycastHit();
+                    //// 3. 레이와 부딛힌 물체의 정보를 저장할 변수를 생성
+                    //RaycastHit hitInfo = new RaycastHit();
 
-                //// 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
-                //bool isHit = Physics.Raycast(ray, out hitInfo);
-                //if (isHit) //데이터가 있다면 (부딛혔다면
-                //{
-                //    // 피격 이펙트 생성(표시)
-                //    BulletEffect.transform.position = hitInfo.point;
-                //    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
-                //    BulletEffect.Play();
+                    //// 4. 레이저를 발사한 다음,                 -에 데이터가 있다면(부딧혔다면) 피격 이펙트 생성(표시)
+                    //bool isHit = Physics.Raycast(ray, out hitInfo);
+                    //if (isHit) //데이터가 있다면 (부딛혔다면
+                    //{
+                    //    // 피격 이펙트 생성(표시)
+                    //    BulletEffect.transform.position = hitInfo.point;
+                    //    BulletEffect.transform.forward = hitInfo.normal; //법선 벡터: 직선에 대하여 수직인 벡터
+                    //    BulletEffect.Play();
 
-                //    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
-                //    // 총알을 맞은 친구가 IDamageable 구현체라면...
-                //    if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
-                //    {
-                //        Damage damage = new Damage();
-                //        damage.Value = 10;
-                //        damage.From = this.gameObject;
-                //        damageable.TakeDamage(damage);
-                //    }
-                //    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
-                //}
-                //// Ray: 레이저( 시작위치, 방향)
-                //// RayCast : 레이저를 발사
-                //// RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
-                //Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
-            }
+                    //    //if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                    //    // 총알을 맞은 친구가 IDamageable 구현체라면...
+                    //    if (hitInfo.collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+                    //    {
+                    //        Damage damage = new Damage();
+                    //        damage.Value = 10;
+                    //        damage.From = this.gameObject;
+                    //        damageable.TakeDamage(damage);
+                    //    }
+                    //    // 게임 수학: 선형대수학(스칼라, 벡터, 행렬), 기하학(삼각함수..)
+                    //}
+                    //// Ray: 레이저( 시작위치, 방향)
+                    //// RayCast : 레이저를 발사
+                    //// RayCastHit: 레이저가 물체와 부딛혔다면 그 정보를 저장하는 구조체
+                    //Debug.DrawRay(FirePosition.transform.position, Camera.main.transform.forward * DebugRayLength, Color.red, 2f);
+                }
         }
         }
     }

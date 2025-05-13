@@ -14,6 +14,11 @@ public class Bullet : MonoBehaviour
     {
         if (Col.transform.TryGetComponent<IDamageable>(out IDamageable idamageable))
         {
+
+            //Debug.Log("칼 맞았다!");
+            //Damage damage = new Damage();
+            //damage.Value = 100;
+            //damageAble.TakeDamage(damage);
             idamageable.TakeDamage(Damage);
         }
     }
