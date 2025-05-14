@@ -55,6 +55,7 @@ public class PlayerFire : MonoBehaviour
     private bool _zoomMode = false;
     public float ZoomInSize = 15f;
     public float ZoomOutSize = 60f;
+    private CameraFollow _cameraFallow;
 
     // 목표: 마우스 왼쪽 버튼을 누르면 카메라가 바라보는 방향으로 총을 발사하고 싶다. 
 
@@ -71,6 +72,7 @@ public class PlayerFire : MonoBehaviour
 
     private void Start()
     {
+        _cameraFallow = Camera.main.GetComponent<CameraFollow>();
         _animator = GetComponentInChildren<Animator>();
         BombCount = MaxBombCount;
         BulletCount = MaxBulletCount;
@@ -78,9 +80,7 @@ public class PlayerFire : MonoBehaviour
         UIManager.Instance.SetBullet(BulletCount, MaxBulletCount);
         Cursor.lockState = CursorLockMode.Locked;
         SetWeaponModeAnimation(CurrentWeaponMode);
-        
     }
-
 
     public void SetWeaponModeAnimation(WeaponMode weaponMode)
     {
@@ -292,7 +292,8 @@ public class PlayerFire : MonoBehaviour
 
         if (CurrentWeaponMode == WeaponMode.Gun && BulletCount > 0)
         {
-            //_animator.SetTrigger("Shot");
+                //_animator.SetTrigger("Shot");
+                _cameraFallow.CameraShake();
             ShotTimer -= Time.deltaTime;
 
             if (ShotTimer < 0)

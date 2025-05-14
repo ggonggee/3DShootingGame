@@ -35157,7 +35157,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2851409207434662411}
   - component: {fileID: 2851409207439967063}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SK_SurvGirl_Body_Arms_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
